@@ -11,6 +11,7 @@ class Circle:
     cx: int
     cy: int
     r: int
+    fill: str
 
 
 @dataclass(eq=True, frozen=True)
@@ -73,11 +74,11 @@ def make_scene(moves: Set[CircleMove]) -> Scene:
     return Scene(moves=moves)
 
 
-def make_story(scenes: List[Scene]) -> Story:
+def make_story(width: int, height: int, scenes: List[Scene]) -> Story:
     duration = reduce(lambda x, y: x + y, map(lambda scene: scene.duration, scenes), 0)
     d = drawsvg.Drawing(
-        400,
-        200,
+        width,
+        height,
         origin="center",
         animation_config=drawsvg.types.SyncedAnimationConfig(
             # Animation configuration
@@ -87,23 +88,26 @@ def make_story(scenes: List[Scene]) -> Story:
         ),
     )
 
-    c = drawsvg.Circle(cx=0, cy=0, r=10)
-    d.append(c)
-
     def add_circle_move(start: int, duration: int, cm: CircleMove) -> None:
         assert isinstance(duration, int)
         circle = drawsvg.Circle(cx=0, cy=0, r=0, fill="red")
-        d.append(circle)
         print(f"add cm {start} ; {cm}")
+        circle.add_key_frame(0, cx=0, cy=0, r=0)
+        circle.add_key_frame(start, cx=0, cy=0, r=0)
         list(
             map(
                 lambda move: circle.add_key_frame(
-                    start + move[0], cx=move[1].cx, cy=move[1].cy, r=move[1].r
+                    start + move[0],
+                    cx=move[1].cx,
+                    cy=move[1].cy,
+                    r=move[1].r,
+                    fill=move[1].fill,
                 ),
                 cm.moves,
             )
         )
         circle.add_key_frame(start + duration, cx=0, cy=0, r=0)
+        d.append(circle)
 
     def rec_add_scene(start: int, scenes: List[Scene]):
         print(f"add scene {start}")
