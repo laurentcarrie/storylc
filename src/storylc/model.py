@@ -8,10 +8,9 @@ import drawsvg  # type:ignore
 
 @dataclass(eq=True, frozen=True)
 class Circle:
-    t: drawsvg.Circle
-
-    def __post_init__(self):
-        assert isinstance(self.t, drawsvg.Circle)
+    cx: int
+    cy: int
+    r: int
 
 
 @dataclass(eq=True, frozen=True)
@@ -31,15 +30,21 @@ class Group:
 
 
 @dataclass(eq=True, frozen=True)
-class CircleMovement:
-    circle: Circle
-    moves: List[Tuple[int, int, int, int]]
+class CircleMove:
+    moves: List[Tuple[int, Circle]]
+
+    @property
+    def duration(self):
+        return reduce(lambda a, b: max(a, b), map(lambda x: x[0], self.moves))
 
 
 @dataclass(eq=True, frozen=True)
 class Scene:
-    movements: Set[CircleMovement]
-    duration: int
+    moves: Set[CircleMove]
+
+    @property
+    def duration(self):
+        return reduce(lambda a, b: max(a, b), map(lambda m: m.duration, self.moves))
 
 
 @dataclass(eq=True, frozen=True)
@@ -47,13 +52,25 @@ class Story:
     scenes: List[Scene]
     t: drawsvg.Drawing
 
+    @property
+    def duration(self) -> int:
+        return reduce(lambda a, b: a + b, map(lambda s: s.duration, self.scenes), 0)
+
 
 def make_rectangle(x: int, y: int, width: int, height: int) -> Rectangle:
     return Rectangle(t=drawsvg.Rectangle(x=x, y=y, width=width, height=height))
 
 
 def make_circle(cx: int, cy: int, r: int) -> Circle:
-    return Circle(t=drawsvg.Circle(cx=cx, cy=cy, r=r))
+    return Circle(cx=cx, cy=cy, r=r)
+
+
+def make_move_circle(moves: List[Tuple[int, Circle]]) -> CircleMove:
+    return CircleMove(moves=moves)
+
+
+def make_scene(moves: Set[CircleMove]) -> Scene:
+    return Scene(moves=moves)
 
 
 def make_story(scenes: List[Scene]) -> Story:
@@ -69,5 +86,34 @@ def make_story(scenes: List[Scene]) -> Story:
             show_playback_controls=True,
         ),
     )
+
+    c = drawsvg.Circle(cx=0, cy=0, r=10)
+    d.append(c)
+
+    def add_circle_move(start: int, duration: int, cm: CircleMove) -> None:
+        assert isinstance(duration, int)
+        circle = drawsvg.Circle(cx=0, cy=0, r=0, fill="red")
+        d.append(circle)
+        print(f"add cm {start} ; {cm}")
+        list(
+            map(
+                lambda move: circle.add_key_frame(
+                    start + move[0], cx=move[1].cx, cy=move[1].cy, r=move[1].r
+                ),
+                cm.moves,
+            )
+        )
+        circle.add_key_frame(start + duration, cx=0, cy=0, r=0)
+
+    def rec_add_scene(start: int, scenes: List[Scene]):
+        print(f"add scene {start}")
+        if len(scenes) == 0:
+            return start
+        scene = scenes[0]
+        scenes = scenes[1:]
+        list(map(lambda cm: add_circle_move(start, scene.duration, cm=cm), scene.moves))
+        rec_add_scene(start + scene.duration, scenes)
+
+    rec_add_scene(start=0, scenes=scenes)
 
     return Story(scenes=scenes, t=d)
