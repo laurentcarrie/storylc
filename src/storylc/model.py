@@ -62,10 +62,6 @@ def make_rectangle(x: int, y: int, width: int, height: int) -> Rectangle:
     return Rectangle(t=drawsvg.Rectangle(x=x, y=y, width=width, height=height))
 
 
-def make_circle(cx: int, cy: int, r: int) -> Circle:
-    return Circle(cx=cx, cy=cy, r=r)
-
-
 def make_move_circle(moves: List[Tuple[int, Circle]]) -> CircleMove:
     return CircleMove(moves=moves)
 
