@@ -21,6 +21,3 @@ fi
 make -C $here
 
 mplayer all.mp4
-
-
-

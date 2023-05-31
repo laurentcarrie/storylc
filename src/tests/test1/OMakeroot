@@ -1,0 +1,8 @@
+
+
+DefineCommandVars()
+
+#
+# Include the OMakefile in this directory.
+#
+.SUBDIRS: .
