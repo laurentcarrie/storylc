@@ -5,6 +5,6 @@ set -x
 
 here=$(dirname $(realpath $0))
 
-( cd $here && mpost slide )
+( cd $here && mpost --tex=latex slide )
 ( cd $here && pdflatex slide && pdflatex slide )
 
