@@ -1,6 +1,6 @@
 #open build/C
 #open build/OCaml
-#pen build/LaTeX
+#open build/LaTeX
 
 #
 # The command-line variables are defined *after* the
@@ -11,12 +11,12 @@ DefineCommandVars()
 #
 # Include the OMakefile in this directory.
 #
-public.srcdir = $(dir .)
+public.srcdir = $(dir $(srcdir))
 
 CREATE_SUBDIRS=true
 vmount(-c, $(srcdir), .)
 
+
 mkdir -p $(prefix)
 
 .SUBDIRS: .
-

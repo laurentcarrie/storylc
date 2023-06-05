@@ -1,0 +1,16 @@
+open configure/Configure
+
+srcdir = $(absname $(dirname $(nth 0, $(argv))))
+
+
+
+
+echo "srcdir = $(srcdir)" > OMakeroot
+echo "prefix = $(absname $(CWD)/install)" >> OMakeroot
+cat $(srcdir)/OMakeroot.default >> OMakeroot
+
+
+
+
+#cat $(srcdir)/OMakefile.default > OMakefile
+cat $(srcdir)/OMakefile > OMakefile

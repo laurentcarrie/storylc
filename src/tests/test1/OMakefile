@@ -1,147 +1,39 @@
-.PHONY: all install clean
+#.SUBDIRS: .
 
-#.SUBDIRS: scene1
+.PHONY: all install clean x
 
-########################################################################
-# C configuration.
-# Delete this section if you are not building C files.
-#
-
-################################################
-# Configuration.  You might want to modify any of these
-# configuration variables.
-#
-
-# CFLAGS +=
-# ASFLAGS +=
-# LDFLAGS +=
-# INCLUDES +=
-
-################################################
-# Uncomment the following section if you want
-# to build a C program in the current directory.
-#
-
-# CFILES[] =
-#    file1
-#    main
-#
-# MAIN = main
-#
-# .DEFAULT: $(CProgram $(MAIN), $(CFILES))
-
-################################################
-# Uncomment the following section if you want to build a C library
-# in the current directory.
-#
-
-# LIBFILES[] =
-#    file1
-#    file2
-#
-# LIB = libxxx
-#
-# .DEFAULT: $(StaticCLibrary $(LIB), $(LIBFILES))
-
-########################################################################
-# OCaml configuration.
-# Delete this section if you are not building OCaml files.
-#
-
-################################################
-# Configuration.  You may want to modify any of these configuration
-# variables.
-#
-
-#
-# This project requires ocamlfind (default - false).
-#
-# USE_OCAMLFIND = true
-#
-# OCAMLPACKS[] =
-#    pack1
-#    pack2
-#
-# if $(not $(OCAMLFIND_EXISTS))
-#    eprintln(This project requires ocamlfind, but is was not found.)
-#    eprintln(You need to install ocamlfind and run "omake --configure".)
-#    exit 1
-
-#
-# Include path
-#
-# OCAMLINCLUDES +=
-
-#
-# Compile native or byte code? 
-#
-# The default values are defined as follows:
-#
-# NATIVE_ENABLED = $(OCAMLOPT_EXISTS)
-# BYTE_ENABLED = $(not $(OCAMLOPT_EXISTS))
-
-#
-# Various options
-#
-# OCAMLFLAGS    +=
-# OCAMLCFLAGS   +=
-# OCAMLOPTFLAGS +=
-# OCAML_LINK_FLAGS +=
-# OCAML_BYTE_LINK_FLAGS +=
-# OCAML_NATIVE_LINK_FLAGS +=
-
-################################################
-# Generated files
-#
-# Workaround for the fact that ocamldep does not pay attention to .mll
-# and .mly files.
-#
-# OCamlGeneratedFiles(parser.ml lexer.ml)
-
-################################################
-# Build an OCaml library
-#
-
-# FILES[] =
-#    file1
-#    file2
-#
-# LIB = main
-#
-# .DEFAULT: $(OCamlLibrary $(LIB), $(FILES))
-
-################################################
-# Build an OCaml program
-#
-
-# FILES[] =
-#    file1
-#    file2
-#
-# PROGRAM =
-# OCAML_LIBS +=
-# OCAML_CLIBS +=
-# OCAML_OTHER_LIBS +=
-# OCAML_LIB_FLAGS +=
-#
-# .DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES))
-
-.SCANNER: %.svg:%.mp
-
-.mp.svg:
+%.svg:%.mp
 	echo "run mpost"
 	mpost $<
 
-scene-1.0.mp scene-1.1.mp: scene-1.mp
-	python ../../storylc/generate.py scene1 10
+duration=5
+ips=20
+mp_files=$(file $(shell python ../../../storylc/generate.py L-mp scene_1 $(ips) $(duration) ))
+svg_files=$(file $(shell python ../../../storylc/generate.py L-svg scene_1 $(ips) $(duration) ))
 
-scene-1.gif: scene-1.0.svg scene-1.1.svg
+
+$(mp_files): scene_1.mp
+	python ../../../storylc/generate.py G scene_1 $(ips) $(duration)
+
+scene_1.gif: $(svg_files)
 	rm -f $@
-	convert -delay 1 -loop 1 -size 1024x1024 scene-1.0.svg scene-1.1.svg $@
+	convert -delay $(div 1000 $(ips)) -loop 100 -size 1024x1024 $(svg_files) $@
+
+%.mp4 : %.gif
+	rm -f $@
+	ffmpeg -i $< -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" $@
 
 
-all: a-1.svg
+all.mp4 :  scene_1.mp4
+	echo $@
+	rm -f $@
+	ffmpeg -f concat -safe 0 -i infile.txt -c copy $@
+
+all : all.mp4
+
+x:
+	echo $(mp_files)
 
 clean:
 	echo "clean"
-	rm -f *.svg *.mp4 *.log *.gif *.*.mp
+	rm -f *.svg *.mp4 *.log *.gif *-*.mp

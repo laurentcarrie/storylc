@@ -1,0 +1,21 @@
+%\documentclass[dvisvgm]{standalone}
+\documentclass{standalone}
+\usepackage{animate,graphicx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Adjust this if necessary!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% basename (!) of PDF file with stroke segments
+\def\fileWithStrokes{multi}
+% frame rate
+\def\FPS{20}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+  \animategraphics[
+    controls={play,stop},
+    buttonsize=2em,
+    poster=last,
+  ]{\FPS}{\fileWithStrokes}{}{}
+\end{document}
+

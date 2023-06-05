@@ -10,12 +10,11 @@ def drawpoint(expr z, c) = draw z
 withpen pencircle scaled 3 withcolor c;
 enddef;
 
+
+def run(expr t) =
 v:=10cm ;
 
-input util
-
-beginfig(1);
-u := 1.25cm;
+u := t * 15cm + 5cm;
 
 pair O,A,B,C,D ;
 O:=(0,0) ;
@@ -27,9 +26,8 @@ D:=(0,-u) ;
 draw A .. B .. C .. D .. cycle ;
 fill A -- B -- C -- D -- cycle withcolor green ;
 
-drawouterframe(0) ;
+%drawouterframe(0) ;
 
 
-endfig;
+enddef;
 
-end;

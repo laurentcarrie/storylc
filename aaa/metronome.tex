@@ -1,0 +1,629 @@
+\listfiles
+%
+% Copyright 2007--\today Alexander Grahn
+%
+% This material is subject to the LaTeX Project Public License. See
+%    http://mirrors.ctan.org/macros/latex/base/lppl.txt
+% for the details of that license.
+%
+%%% force dvi %%%
+\ifdefined\outputmode\outputmode=0\fi
+\ifdefined\pdfoutput\pdfoutput=0\fi
+%%%%%%% pdfmanagement-testphase %%%%%%
+\DocumentMetadata % activates the PDF management interface
+{
+  %testphase=new-or-1
+  %uncompress,
+}
+%%%%%% /pdfmanagement-testphase %%%%%%
+\documentclass[a4paper]{article}
+\frenchspacing
+\usepackage[buttonbg=0.9]{animate}
+\usepackage[UKenglish]{babel}
+\usepackage{pst-3dplot}
+\usepackage{pst-node,pst-plot,pst-tools,pst-text,pst-ode}
+\usepackage{media9}
+\usepackage{intcalc}
+\usepackage{graphicx}
+\graphicspath{{files/}}
+\addmediapath{files}
+\usepackage{textcomp}
+\usepackage{mflogo}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage{lmodern}
+  \usepackage[tt=false]{libertine} %override beramono (doesn't look like tt font)
+  \usepackage{libertinust1math}
+\usepackage[protrusion]{microtype}
+\usepackage{parskip}
+\usepackage{tabls}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage[ocgcolorlinks]{ocgx2}
+\usepackage{amsmath}
+\usepackage{fancyvrb}
+\usepackage{tabularx}
+\usepackage[all]{hypcap}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily,columns=fullflexible,language={[LaTeX]TeX},commentstyle=\color{gray}}
+
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\renewcommand{\textfraction}{0.0}
+\renewcommand{\topfraction}{1.0}
+\renewcommand{\bottomfraction}{1.0}
+
+\makeatletter
+\renewcommand{\fnum@figure}[1]{\figurename~\thefigure}
+\newcommand\myparagraph{\@startsection{paragraph}{3}{\z@}%
+                                     {\parskip}%
+                                     {0.001\parskip}%
+                                     {\itshape\normalsize}}
+\makeatother
+
+\def\keywords{include portable PDF animation SVG animation animated PDF animated SVG dvisvgm html TeX4ht web animating embed animated graphics LaTeX pdfLaTeX LuaLaTeX PSTricks pgf TikZ LaTeX-picture MetaPost inline graphics vector graphics animated GIF LaTeX dvips ps2pdf dvipdfmx XeLaTeX JavaScript Acrobat Reader KDE Okular PDF-XChange Foxit Reader Firefox Chrome Chromium}
+\hypersetup{
+  pdftitle={The animate Package},
+  pdfsubject={Documentation},
+  pdfauthor={Alexander Grahn},
+  pdfkeywords={\keywords},
+  allcolors=blue,
+  bookmarksnumbered,linktocpage
+}
+
+\def\XeLaTeX{X\kern-.1667em\lower.5ex\hbox{\reflectbox{E}}\kern-.125em\LaTeX}
+\def\XeTeX{X\kern-.1667em\lower.5ex\hbox{\reflectbox{E}}\kern-.125em\TeX}
+\def\pXepLaTeX{(X\kern-.1667em\lower.5ex\hbox{\reflectbox{E}})\kern-.125em\LaTeX}
+
+\def\parsedate#1/#2/#3\relax{
+  \def\year{#1}
+  \def\month{#2}
+  \def\day{#3}
+}
+
+\hyphenation{Ja-va-Script pro-vid-ed}
+\makeatletter
+\let\animVersion\@anim@version
+\makeatother
+
+\begin{document}
+\title{The {\sffamily animate} Package}
+\begingroup
+\makeatletter
+\def\@anim@sanitizeColon{}\def\@anim@sanitizeJS{}\def\@anim@endsanitize{}
+\expandafter\parsedate\animVersion\relax %set current date to package date
+\makeatother
+\author{Alexander Grahn \animategraphics[autoplay,loop,height=1.8ex,nomouse]{8}{bye_}{0}{3}\protect\footnote{Animated GIF taken from \href{http://www.phpBB.com}{phpBB} forum software and burst into a set of EPS files using \href{http://www.imagemagick.org}{ImageMagick} before embedding.}%
+%\space\protect\footnote{Animations may run slowly if viewed in the Acrobat Reader browser plugin.}%
+\\[1ex]\url{https://gitlab.com/agrahn/animate}}
+\maketitle
+\endgroup
+\begin{abstract}
+\raggedright
+
+\noindent A LaTeX package for creating portable, JavaScript driven PDF and SVG animations from sets of vector graphics or raster image files or from inline graphics.
+\vskip 0.2\baselineskip
+
+\emph{Keywords}: \keywords
+\end{abstract}
+%\vspace{1.5cm}
+\tableofcontents
+
+%\newpage
+\section{Examples}
+
+
+
+The last inline example in Fig.~\ref{fig:metronome} is a ticking metronome written by Manuel Luque~\cite{luque12}. The short clicking sound was embedded by means of the `media9' package. Whenever the pendulum reaches one of its reversal points, playback of the sound file is started using JavaScript. The JavaScript code was inserted at the corresponding frame specifications in a timeline file. Since the PSTricks macros for drawing the metronome body and the pendulum are quite long they have been moved into an external file, \verb+files/pstmetronome.tex+. Note that the sound can be heard only on Win and Mac platforms. Even then, mileage may vary. A dual core CPU may be necessary for fluent playback.
+\begin{figure}[hb]
+\centering
+\begin{VerbatimOut}{files/pstmetronome.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% animated metronome
+% this code is based to 99.9 percent on the work by Manuel Luque
+% (pstricks.blogspot.com)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\pst@addfams{pst-metronome}
+\define@key[psset]{pst-metronome}{theta0}{\def\psk@oscmetronomethetai{#1 }}
+\psset[pst-metronome]{theta0=45} % position initiale du metronome
+\define@key[psset]{pst-metronome}{M}{\def\psk@oscmetronometM{#1 }}
+\psset[pst-metronome]{M=25} % masse du disque en g
+\define@key[psset]{pst-metronome}{m}{\def\psk@oscmetronometm{#1 }}
+\psset[pst-metronome]{m=6} % masse du curseur en g
+\define@key[psset]{pst-metronome}{r}{\def\psk@oscmetronomer{#1 }}
+\psset[pst-metronome]{r=1} % rayon du disque en cm
+\define@key[psset]{pst-metronome}{x}{\def\psk@oscmetronomex{#1 }}
+\psset[pst-metronome]{x=8.4} % position du curseur en cm par rapport à l'axe
+\define@key[psset]{pst-metronome}{d}{\def\psk@oscmetronomed{#1 }}
+\psset[pst-metronome]{d=3.2} % distance de l'axe au centre du disque en cm
+\define@key[psset]{pst-metronome}{dt}{\def\psk@oscmetronomedt{#1 }}
+\psset[pst-metronome]{dt=0.01} % pas pour RK4
+\define@key[psset]{pst-metronome}{nT}{\def\psk@oscmetronomenT{#1 }}
+\psset[pst-metronome]{nT=1} % nombre de périodes représentées
+%---- calculer theta(t) et thetapoint(t) --------
+\def\psmetronome{\pst@object{psmetronome}}
+\def\psmetronome@i{%
+\begingroup%
+\use@par%
+  \begin@SpecialObj%
+  \pstVerb{%
+ /deg2rad {180 div 3.14159 mul} def
+ /rad2deg {180 mul 3.14159 div} def
+ /gp 9.8 def % pesanteur
+ /radius \psk@oscmetronomer 1e-2 mul def % en m
+ /OA \psk@oscmetronomed 1e-2 mul def % distance de l'axe au centre du disque en m
+ /xC \psk@oscmetronomex 1e-2 mul def % position du curseur en m par rapport à l'axe
+ /theta0 \psk@oscmetronomethetai def % en degrés
+ /theta0rad theta0 deg2rad def % en radians
+ /Md \psk@oscmetronometM 1e-3 mul def % en kg
+ /mc \psk@oscmetronometm 1e-3 mul def % en kg
+ /dt \psk@oscmetronomedt def
+ /nT \psk@oscmetronomenT def
+ % moment d'inertie du métronome
+ % J=1/2M*R^2+M*a^2+m*x^2
+ /Ji {0.5 Md mul radius dup mul mul Md OA dup mul mul add mc xC dup mul mul add} def
+ /AT {4
+      Ji
+      gp Md OA mul mc xC mul sub mul
+      div
+      sqrt
+      mul} def
+ % Pour le calcul de la période
+ % coefficients de l'approximation polynômiale du calcul
+ % de l'intégrale elliptique
+% coefficient pour le calcul de l'intégrale elliptique
+        /m0 theta0 2 div sin def
+        /m1 {1 m0 dup mul sub} def
+        /m2 {m1 dup mul} def
+        /m3 {m2 m1 mul} def
+        /m4 {m2 dup mul} def
+        /m_1 {1 m1 div} def
+     /EllipticK {
+        0.5
+        0.12498593597 m1 mul add
+        0.06880248576 m2 mul add
+        0.03328355376 m3 mul add
+        0.00441787012 m4 mul add
+        m_1 ln mul
+        1.38629436112 add
+        0.09666344259 m1 mul add
+        0.03590092383 m2 mul add
+        0.03742563713 m3 mul add
+        0.01451196212 m4 mul add
+      } def
+/Tm {AT EllipticK mul} def
+% tableau des valeurs de theta(t)
+    /W 0 def % vitesse angulaire
+    /theta theta0 def
+    /oscillateur {sin gp Md OA mul mc xC mul sub mul neg mul Ji div} def
+    /j1 {W dt mul} def
+    /k1 {theta oscillateur dt mul} def
+    /j2 {W k1 2 div add dt mul} def
+    /k2 {theta j1 2 div rad2deg add oscillateur dt mul} def
+    /j3 {W k2 2 div add dt mul} def
+    /k3 {theta j2 2 div rad2deg add oscillateur dt mul} def
+    /j4 {W k3 add dt mul} def
+    /k4 {theta j3 rad2deg add oscillateur dt mul} def
+    /theta2 {theta j1 rad2deg 2 j2 rad2deg j3 rad2deg add mul add j4 rad2deg add 6 div add} def
+/tabTheta [ % pour l'animation
+    0 theta0 % date angle
+dt dt Tm nT mul{ %
+    theta2 %
+    /W2 W k1 2 k2 k3 add mul add k4 add 6 div add def
+    /theta theta2 def
+    /W W2 def
+    }  for
+        ] def
+/Nvaleurs tabTheta length 2 div cvi def
+    /W 0 def % vitesse angulaire
+    /theta theta0 def
+/tabThetaGraph [ % pour le graphique theta(t)
+    0 theta0  % date angle
+0 dt Tm nT mul { % pop
+    theta2 % 180 div 3.14159 mul
+    /W2 W k1 2 k2 k3 add mul add k4 add 6 div add def
+    /theta theta2 def
+    /W W2 def
+    }  for
+        ] def
+    /W 0 def % vitesse angulaire
+    /theta theta0 def
+/tabThetaPoint [ % pour le graphique thetapoint(t)
+    0 0  % date angle
+dt dt Tm nT mul { % pop
+%    theta2 % 180 div 3.14159 mul
+    /W2 W k1 2 k2 k3 add mul add k4 add 6 div add def
+    W2
+    /theta theta2 def
+    /W W2 def
+    }  for
+        ] def
+/tabXOSC [ % oscillations par min en fonction de x
+0.5 0.1 12 {/xc exch def
+ /xC xc 1e-2 mul def
+ xc 60 Tm div % cvi
+ } for
+        ] def
+/tabXbattements [ % battements par min en fonction de x
+3 0.1 12 {/xc exch def
+ /xC xc 1e-2 mul def
+ xc 60 Tm div 2 mul % cvi
+ } for
+        ] def
+% graduation T --> x
+/tabXT [ % [T,x]
+ 40 1 220 {/batt exch def % battements
+ /Tmetronome2 120 batt div dup mul def
+ /A1 16 mc mul EllipticK dup mul mul def
+ /B1 gp Tmetronome2 mul mc mul def
+ /C1 gp Md mul OA mul Tmetronome2 mul neg
+     8 Md mul radius dup mul mul 16 Md mul OA dup mul mul add EllipticK dup mul mul add def
+ /Delta B1 dup mul 4 A1 mul C1 mul sub sqrt def
+ /xC1 B1 neg Delta sub 2 div A1 div def
+ /xC2 B1 neg Delta add 2 div A1 div def
+ xC2 0 ge {/posC xC2 def}{/posC xC1 def} ifelse
+ batt posC 1e2 mul
+ } for
+        ] def
+/xT { % pour une valeur particulière battement -> position du curseur
+    /batt exch def
+    /Tmetronome2 120 batt div dup mul def
+    /A1 16 mc mul EllipticK dup mul mul def
+    /B1 gp Tmetronome2 mul mc mul def
+    /C1 gp Md mul OA mul Tmetronome2 mul neg
+     8 Md mul radius dup mul mul 16 Md mul OA dup mul mul add EllipticK dup mul mul add def
+    /Delta B1 dup mul 4 A1 mul C1 mul sub sqrt def
+    /xC1 B1 neg Delta sub 2 div A1 div def
+    /xC2 B1 neg Delta add 2 div A1 div def
+     xC2 0 ge {/posC xC2 def}{/posC xC1 def} ifelse
+     posC 1e2 mul
+ } def
+/xC \psk@oscmetronomex 1e-2 mul def % position du curseur en m par rapport à l'axe
+/Tm {AT EllipticK mul} def
+  }%
+  \end@SpecialObj%
+\endgroup}
+%
+\def\psmetronomeA{\pst@object{psmetronomeA}}
+\def\psmetronomeA@i{%
+\begingroup%
+\use@par%
+  \begin@SpecialObj%
+  \pstVerb{%
+ /radius \psk@oscmetronomer 1e-2 mul def % en m
+ /OA \psk@oscmetronomed 1e-2 mul def % distance de l'axe au centre du disque en m
+ /xC \psk@oscmetronomex 1e-2 mul def % position du curseur en m par rapport à l'axe
+  }%
+\psframe[fillstyle=solid](! -0.075 \psk@oscmetronomed neg)(0.075,13)
+\pscircle[fillstyle=solid,fillcolor={[rgb]{0.75 0.75 0.75}}](! 0 \psk@oscmetronomed neg){!radius 1e2 mul}
+\pscircle[fillstyle=solid,linewidth=0.05](0,0){0.15}
+\pscircle*[linecolor=red](0,0){0.05}
+% curseur
+\pspolygon[fillstyle=solid](! -0.25 \psk@oscmetronomex 0.5 sub)(! -0.5 \psk@oscmetronomex 0.5 add)(!-0.075 \psk@oscmetronomex 0.5 add)(!-0.075 \psk@oscmetronomex 0.5 sub)
+\pspolygon[fillstyle=solid](! 0.25 \psk@oscmetronomex 0.5 sub)(! 0.5 \psk@oscmetronomex 0.5 add)(!0.075 \psk@oscmetronomex 0.5 add)(!0.075 \psk@oscmetronomex 0.5 sub)
+\pspolygon[fillstyle=solid,fillcolor=gray](! -0.25 \psk@oscmetronomex 0.5 sub)(! -0.3 \psk@oscmetronomex 0.3 sub)(! -0.075 \psk@oscmetronomex 0.3 sub)(!-0.075 \psk@oscmetronomex 0.3 add)(!0.075 \psk@oscmetronomex 0.3 add)(!0.075 \psk@oscmetronomex 0.3 sub)(!0.3 \psk@oscmetronomex 0.3 sub)(!0.25 \psk@oscmetronomex 0.5 sub)
+\pscircle[fillstyle=solid](!-0.125 \psk@oscmetronomex 0.4 sub){0.08}
+\pscircle[fillstyle=solid](!0.125 \psk@oscmetronomex 0.4 sub){0.08}
+% fin curseur
+{\psset{linecolor=red}
+\psline(!-.1 \psk@oscmetronomex)(!0.1 \psk@oscmetronomex)\psline(!0 \psk@oscmetronomex 0.1 sub)(!0 \psk@oscmetronomex 0.1 add)
+\psline(! -.1 \psk@oscmetronomed neg)(!0.1 \psk@oscmetronomed neg)\psline(! 0 \psk@oscmetronomed neg 0.1 sub)(!0 \psk@oscmetronomed neg 0.1 add)}
+\pnode(!0 \psk@oscmetronomex){C}% curseur
+\pnode(! 0 \psk@oscmetronomed neg){D}% disque
+%\pstextpath[c](0,-2ex){\psarcn[linestyle=none](D){1}{180}{0}}{\small\textsf{\textbf{m e t r o n o m e}}}
+%\pstextpath[c](0,1ex){\psarc[linestyle=none](D){1}{180}{0}}{\small\textsf{\textbf{P S t r i c k s}}}
+  \end@SpecialObj%
+\endgroup}
+\psmetronome%
+\pstVerb{/tabTempos [40 42 44 46 48 50 52 54 46 58 60 63 66 69 72 76 80 84 88 92 96 100 104 108 112 116 120 126 132 138 144 152 160 168 176 184 192 200 208] def}%
+
+\def\metronomebody{%
+  \pspolygon[fillstyle=solid,linewidth=2\pslinewidth,linearc=0.5,fillcolor=yellow!30](-5,-4.5)(5,-4.5)(1,14)(-1,14)
+  \psline(1.2,4.5)(1.2,12.5)
+  \psline(-1.2,4.5)(-1.2,12.5)
+  \multido{\i=0+2}{20}{%
+     \pstVerb{/BATT tabTempos \i\space get def}
+     \psline[linecolor=red](!1.2 BATT xT)(!0.7 BATT xT)
+     \uput[r](!0.7 BATT xT){\psPrintValue[PSfont=Helvetica,fontscale=6]{BATT}}
+  }%
+  \multido{\i=1+2}{19}{%
+     \pstVerb{/BATT tabTempos \i\space get def}
+     \psline[linecolor=red](!-1.2 BATT xT)(!-0.7 BATT xT)
+     \uput[r](!-1.3 BATT xT){\psPrintValue[PSfont=Helvetica,fontscale=6]{BATT}}}%
+  \rput(!0 40 xT){\textsf{\tiny GRAVE}}%
+  \rput(!0 46 xT){\textsf{\tiny LARGO}}%
+  \rput(!0 52 xT){\textsf{\tiny LENTO}}%
+  \rput(!0 58 xT){\textsf{\tiny ADAGIO}}%
+  \rput(!0 60 xT){\textsf{\tiny LARGETTO}}%
+  \rput(!0 66 xT){\textsf{\tiny ANDANTE}}%
+  \rput(!0 76 xT){\textsf{\tiny ANDANTINO}}%
+  \rput(!0 84 xT){\textsf{\tiny MODERATO}}%
+  \rput(!0 108 xT){\textsf{\tiny ALLEGRETTO}}%
+  \rput(!0 132 xT){\textsf{\tiny ALLEGRO}}%
+  \rput(!0 160 xT){\textsf{\tiny VIVACE}}%
+  \rput(!0 184 xT){\textsf{\tiny PRESTO}}%
+  \rput(!0 200 xT){\textsf{\tiny PRESTISSIMO}}%
+}
+
+\def\pendulum#1{%
+  \pstVerb{/iA #1\space def /date tabTheta iA get def /Theta tabTheta iA 1 add get def}%
+  \rput{!Theta}{\psmetronomeA}%
+}
+\makeatother
+\end{VerbatimOut}
+\begin{VerbatimOut}{metro.txt}
+::0x0,1 : annotRM['click'].callAS('play');
+::2
+::3
+::4
+::5
+::6
+::7
+::8
+::9
+::10
+::11
+::12
+::13
+::14
+::15
+::16
+::17
+::18
+::19
+::20
+::21
+::22
+::23
+::24
+::25
+::26 : annotRM['click'].callAS('play');
+\end{VerbatimOut}
+%loading metronome macros from external file
+\input{files/pstmetronome}
+%sound inclusion: click.mp3
+\makebox[0pt][r]{\includemedia[
+  width=1ex,height=1ex,
+  label=click,
+  addresource=click.mp3,
+  activate=pageopen,transparent,noplaybutton,
+  flashvars={source=click.mp3&hideBar=true}
+]{}{APlayer.swf}}%
+%animated metronome
+\begin{animateinline}[
+  controls,
+  width=0.7\linewidth,
+  palindrome,
+  begin={\begin{pspicture}(-9.5,-5)(9.5,15)},
+  end={\end{pspicture}},
+  timeline=metro.txt
+]{25}
+  %metronome without pendulum
+  \metronomebody
+\newframe
+  %half period of pendulum swing (26 frames)
+  \multiframe{26}{i=0+4}{
+    \pendulum{\i}
+  }
+\end{animateinline}
+\caption{}\label{fig:metronome}
+\end{figure}
+%\small
+\begin{lstlisting}
+\documentclass[12pt]{article}
+\usepackage{pstricks,pst-node,pst-plot,pst-tools,pst-text}
+\usepackage{animate}
+\usepackage{media9}
+
+%writing timeline to external file
+\begin{filecontents}{metro.txt}
+::0x0,1 : annotRM['click'].callAS('play');
+::2
+::3
+::4
+::5
+::6
+::7
+::8
+::9
+::10
+::11
+::12
+::13
+::14
+::15
+::16
+::17
+::18
+::19
+::20
+::21
+::22
+::23
+::24
+::25
+::26 : annotRM['click'].callAS('play');
+\end{filecontents}
+
+\begin{document}
+
+\begin{center}
+  %loading metronome macros from external file
+  \input{files/pstmetronome}
+  %
+  %sound inclusion: click.mp3
+  \makebox[0pt][r]{\includemedia[
+    width=1ex,height=1ex,
+    label=click,
+    addresource=click.mp3,
+    activate=pageopen,transparent,noplaybutton,
+    flashvars={source=click.mp3&hideBar=true}
+  ]{}{APlayer.swf}}%
+  %
+  %animated metronome
+  \begin{animateinline}[
+    controls,
+    width=0.7\linewidth,
+    palindrome,
+    begin={\begin{pspicture}(-9.5,-5)(9.5,15)},
+    end={\end{pspicture}},
+    timeline=metro.txt
+  ]{25}
+    %metronome without pendulum
+    \metronomebody
+  \newframe
+    %half period of pendulum swing (26 frames)
+    \multiframe{26}{i=0+4}{
+      \pendulum{\i}
+    }
+  \end{animateinline}
+\end{center}
+
+\end{document}
+\end{lstlisting}
+
+\section{Animated SVG}
+Thanks to Martin Gieseking's \verb+dvisvgm+ utility~\cite{dvisvgm} that ships with all major \TeX{} distributions, package `animate' can produce self-contained animated SVG, with all the bits and pieces already included that are necessary to run in modern Web browsers as standalone files or as embedded objects within a Web page made of HTML. Animations have the same look and usability, including optional control buttons, as if they were embedded in a PDF document. Animated SVG even work on mobile devices.
+
+As \verb+dvisvgm+ is linked against the Ghostscript library, it can parse and convert embedded PostScript to inline SVG code. It is therefore compatible with the popular TikZ and PSTricks \LaTeX{} packages.
+ 
+SVG is a single-page graphics format. Therefore, it is recommended to produce documents with a single animation per file or page. Thereafter, \verb+dvisvgm+ converts every page of the DVI input to a standalone animated SVG file. You may want to use the `standalone' document class for creating standalone SVG animations. Pass `\verb+dvisvgm+' as a global document class option. In this way, it gets conveyed to `animate' and other packages to be loaded, such as `graphicx' or TikZ.
+
+The following code may serve as a template for generating standalone animated SVG:
+\begin{lstlisting}
+\documentclass[dvisvgm]{standalone}
+
+%\usepackage{xcolor}
+%\pagecolor{white} % opaque background with solid colour
+
+%\usepackage{pstricks} % enable as needed
+%\usepackage{tikz}
+
+\usepackage{animate}
+\usepackage{graphicx}
+
+\begin{document}
+%
+% \animategraphics{..}{...}{...}{...}
+%
+% or  
+%  
+% \begin{animateinline}{..} ... \end{animateinline} 
+%
+\end{document}
+\end{lstlisting}
+Note that when animating external graphics with \verb+\animategraphics+, only PDF and PostScript (EPS, PS, MPS) files are converted to inline SVG code; files in other formats (SVG, PNG, JPEG) remain external and must be bundled with the final SVG output. Thus, for obtaining self-contained SVG, it is recommended to convert PNG, JPEG and SVG files to PDF or PostScript first. Also note that PostScript files must have all required fonts embedded. This is not always the case for \MP-generated PostScript. Here, embedding of fonts is ensured by putting `\verb+prologues := 3;+' into the header of the \MP{} input.
+
+Use one of
+\begin{verbatim}
+latex
+platex
+dvilualatex
+xelatex -no-pdf
+\end{verbatim}
+to produce DVI or XDV output from the \LaTeX{} source. After this, SVG is obtained by running
+\begin{verbatim}
+dvisvgm --font-format=woff --exact --zoom=-1 --page=1,- --optimize ...
+\end{verbatim}
+%\begin{verbatim}
+%dvisvgm --font-format=woff --exact --zoom=-1 --page=1,- ...
+%\end{verbatim}
+on the intermediate DVI or XDV file.
+
+Option `\verb+--font-format=woff+' (or `\verb+--font-format=woff2+') prompts \verb+dvisvgm+ to embed document fonts in a format that is understood by Web browsers. It ensures that typeset text looks as in normal PDF output.
+
+Option `\verb+--exact+' tells \verb+dvisvgm+ to calculate exact bounding boxes around font glyphs. This avoids clipping of glyphs in the SVG output, as glyphs usually tend to be slightly bigger than their boxes defined in the font files.
+
+The purpose of `\verb+--zoom=-1+' is to produce responsive SVG. If embedded in a Web page, this kind of SVG will automatically scale to fill up the available space of its surrounding container, usually an \verb+<object>+ tag (see below). If viewed standalone in a Web browser, a responsive SVG fills up the complete browser tab.
+
+By default, \verb+dvisvgm+ processes only the very first page of the input file. To convert multipage DVI/XDV with several animations, add option `\verb+--page=1,-+'.
+
+With option `\verb+--optimize+', \verb+dvisvgm+ applies several optimizations to reduce the output file size.
+
+As SVG derives from XML it is not known to be particularly economical in terms of file size. Compressed SVG, with file extension `\verb+svgz+', shortens download times and is supported by most Web browsers. It can be generated by adding option `\verb+-z+'. Also, option `\verb+--precision=1+' may be used to reduce the SVG file size. It limits the precision of floating point numbers, such as coordinates, to one decimal figure. Sometimes, animations may behave stangely after applying this option. Then, of course, it should be omitted.
+
+The recommended way to include animated SVG into HTML is to use the \verb+<object>+ tag. The \verb+<img>+ tag does not work here, as it ignores the embedded JavaScript. However, it may still be used as fallback. Also, it allows for search engine indexing, if desired:
+\begin{lstlisting}
+<object type="image/svg+xml" data="animatedImage.svg">
+  <!-- optional (increases loading time):
+       fallback & search engine indexing -->
+  <img src="animatedImage.svg" />
+</object>
+\end{lstlisting}
+
+In \TeX4ht documents, the whole \verb+<object>...</object>+ tag can be inserted by wrapping it in a \verb+\HCode{...}+ command.
+
+\section{Bugs}\label{sect:bugs}
+\begin{itemize}
+  \item The maximum frame rate that can actually be achieved largely depends on the complexity of the graphics and on the available hardware. In Acrobat Reader, you might want to experiment with the 2D graphical hardware acceleration feature. Go to menu `Edit' $\rightarrow$ `Preferences' $\rightarrow$ `Page Display' $\rightarrow$ `Rendering' to see whether hardware acceleration is available. A 2D GPU acceleration check box will be visible if a supported video card has been detected. Also, enabling or disabling the page cache (`Edit' $\rightarrow$ `Preferences' $\rightarrow$ `Page Display' $\rightarrow$ `Rendering' $\rightarrow$ `Use page cache') may affect the rendering performance.
+
+  \item Animated SVG is best viewed in Web browsers that are based on the Blink rendering engine. The most prominent representatives are Chrome, its open-source base Chromium and Opera. Unfortunately, in Firefox some animations run slowly, especially if the graphics make use of clipping operations.
+
+  \item The \verb+dvips+ option `\verb+-Ppdf+' should be avoided entirely or followed by something like `\verb+-D 1200+' on the command line in order to set a sensible DVI resolution. This does \emph{not} degrade the output quality! The configuration file `config.pdf' loaded by option `\verb+-Ppdf+' specifies an excessively high DVI resolution that will be passed on to the final PDF. Eventually, Acrobat Reader gets confused and will not display the frames within the animation widget.
+
+  \item Animations do not work if the PDF was produced with Ghostscript versions older than 9.15.
+
+  \item If the `\verb+animateinline+' environment is used in a right-to-left typesetting context (RTL) and using the (pdf)\LaTeX{} and \XeLaTeX{} engines, every frame's content should be enclosed in a pair of \verb+\beginR+ and \verb+\endR+ commands in order to correctly typeset RTL text contained therein. This can be conveniently done by means of the `\verb+begin+' and `\verb+end+' \hyperlink{beginend}{options} of the `\verb+animateinline+' environment.
+
+%  \item If the \LaTeX{} $\rightarrow$ \verb+dvips+ $\rightarrow$ \verb+ps2pdf+/Distiller route is being taken, make sure that the original graphics size (i.\,e. not scaled by any of the `{\tt scale}', `{\tt width}', `{\tt height}' or `{\tt totalheight}' options) does not exceed the page size of the final document. During PS to PDF conversion every graphic of the animation is temporarily moved to the upper left page corner. Those parts of the graphics that do not fit onto the document page will be clipped in the resulting PDF. Fortunately, graphics files for building animations may be resized easily to fit into a given bounding box by means of the `{\tt epsffit}' command line tool:
+%
+%\quad{\tt epsffit -c <llx> <lly> <urx> <ury> infile.eps outfile.eps}
+%
+%{\tt <llx> <lly> <urx> <ury>} are the bounding box coordinates of the target document. They can be determined using Ghostscript. For a document named `document.ps' the command line is
+%
+%\quad{\tt gs -dNOPAUSE -q -dBATCH -sDEVICE=bbox document.ps}
+%
+%Note that the name of the Ghostscript executable may vary between operating systems (e.\,g. `{\tt gswin32c.exe}' on Win/DOS).
+
+  \item\hypertarget{dest:mem}{} Animations with complex graphics and/or many frames may cause \LaTeX{} to fail with a `\verb+TeX capacity exceeded+' error. The following steps should fix most of the memory related problems.
+
+  MiK\TeX:
+  \begin{enumerate}
+    \item Open a DOS command prompt window (execute `cmd.exe' via `Start' $\rightarrow$ `Run').
+    \item\label{item:firststep} At the DOS prompt, enter\\
+    {\tt initexmf -{}-edit-config-file=latex}
+    \item Type\\
+    {\tt main\_memory=12000000}\\
+    into the editor window that opens, save the file and quit the editor.
+    \item\label{item:laststep} To rebuild the format, enter\\
+    {\tt initexmf -{}-dump=latex}
+    \item Repeat steps \ref{item:firststep}--\ref{item:laststep} with config files {\tt pdflatex} and {\tt xelatex}
+  \end{enumerate}
+
+  \TeX\ Live:
+  \begin{enumerate}
+    \item Find the configuration file `texmf.cnf' by means of\\
+    {\tt kpsewhich texmf.cnf}\\
+    at the shell prompt in a terminal.
+    \item As Root, open the file in your favourite text editor, scroll to the\\`{\tt main\_memory}' entry and change it to the value given above; save and quit.
+    \item Rebuild the formats by\\
+    {\tt fmtutil-sys -{}-byfmt latex}\\
+    {\tt fmtutil-sys -{}-byfmt pdflatex}\\
+    {\tt fmtutil-sys -{}-byfmt xelatex}
+  \end{enumerate}
+
+%  \item If a PDF containing animations is post-processed using tools like PDFtk to split the document into separate files, then animations in the output documents may not work.
+
+  \item PDFs with animations cannot be embedded (via {\tt\string\includegraphics},\\ {\tt\string\includepdf}) into other documents as the animation capability gets lost.
+
+  \item Animations should not be placed on \emph{multilayered} slides, also known as overlays, created with presentation making classes such as Beamer or Powerdot. Those document classes turn overlays into separate PDF pages and re-insert the animation on every page thus produced. The animations are independent from each other and do not share the current playing state, such as frame number, playing speed and direction. Therefore, put animations on flat slides only; slides without animations may still have overlays, of course. On \href{https://tex.stackexchange.com/a/385209}{\TeX.SE}~\cite{texsx}, a method is suggested for placing an animation on a slide with overlays. It makes use of the programming interface introduced in Sect.~\ref{sect:api}, p.~\pageref{sect:api}.
+\end{itemize}
+
+\section{Acknowledgements}
+I would like to thank François Lafont who discovered quite a few bugs and made many suggestions that helped to improve the functionality of the package. Many thanks to Jin-Hwan Cho, the developer of \verb+dvipdfmx+, for contributing the \verb+dvipdfmx+ specific code, and to Walter Scott for proof-reading the documentation.
+
+%\enlargethispage{4ex}
+\begin{thebibliography}{8}
+\bibitem{chupin} Chupin, M.: \emph{Syracuse MetaPost/Animations.} URL: \href{http://melusine.eu.org/syracuse/metapost/animations/chupin/?idsec=scara}{\texttt{http://melusine.eu.org/}} \href{http://melusine.eu.org/syracuse/metapost/animations/chupin/?idsec=scara}{\texttt{syracuse/metapost/animations/chupin/?idsec=scara}}
+\bibitem{dvisvgm} \emph{dvisvgm: A fast DVI to SVG converter} URL: \url{http://dvisvgm.de}
+\bibitem{gilg05} Gilg, J.: PDF-Animationen. In: \emph{Die \TeX nische Kom\"odie}, Issue 4, 2005, pp.~30--37
+\bibitem{hol} Holeček, J.; Sojka, P.: Animations in pdf\TeX-generated PDF. In: \emph{\TeX, XML, and Digital Typography}, Springer, 2004, pp.~179--191. doi:10.1007/978-3-540-27773-6\textunderscore14
+\bibitem{luque12} Luque, M.: \emph{PSTricks : applications.} URL: \url{http://pstricks.blogspot.com}
+\bibitem{media4svg} \emph{The media4svg Package}. URL: \url{http://www.ctan.org/pkg/media4svg}
+\bibitem{media9} \emph{The media9 Package}. URL: \url{http://www.ctan.org/pkg/media9}
+\bibitem{texsx} \emph{Beamer: animate package and overlay}. URL: \href{https://tex.stackexchange.com/a/385209}{\texttt{https://tex.stackexchange.com}}\\ \href{https://tex.stackexchange.com/a/385209}{\texttt{/a/385209}}
+\end{thebibliography}
+
+\end{document}
