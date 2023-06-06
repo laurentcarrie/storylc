@@ -73,10 +73,10 @@ vardef gitremote(expr  t)=
     pair XA,XB,Y ;
     path PX,PY ;
     for i:=ustep step ustep until maxu :
-        u:=i*.05 ;
+        u:=i*.05cm ;
         %j:=i+ustep ;
         X := i[XB,XH] ;
-        %draw origin -- X ;
+        draw origin -- X ;
         %PX := fullcircle scaled r shifted X ;
         %draw  fullcircle scaled r shifted X ;
         %Y := j[XB,XH] ;
