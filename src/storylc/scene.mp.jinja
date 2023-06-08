@@ -1,0 +1,21 @@
+prologues:=3;
+outputtemplate := "%j_%c.mps";
+outputformat := "mps";
+
+
+
+input boxes ;
+input TEX ;
+%input mounted/{{ scene.path.replace(".mp","") }} ;
+
+
+
+for i:=0 upto {{ scene.duration * scene.ips }}:
+	beginfig(i);
+	    %scene(i) ;
+	    draw origin -- (10,10) ;
+	endfig ;
+endfor;
+
+
+end.

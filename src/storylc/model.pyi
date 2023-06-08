@@ -4,13 +4,15 @@ from typing import Any, List
 
 class Scene:
     __match_args__: Any
-    path: Path
     name: str
     duration: int
+    ips: int
+    path: str
 
-    def __init__(self, path: Path, name: str, duration: int) -> None: ...
+    def __init__(self, name: str, duration: int, ips: int, path: str) -> None: ...
 
 class Movie:
     __match_args__: Any
     scenes: List[Scene]
-    def __init__(self, scenes: List[Scene]) -> None: ...
+    root: Path = Path(".")
+    def __init__(self, scenes: List[Scene], root: Path = Path(".")) -> None: ...

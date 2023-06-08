@@ -1,0 +1,19 @@
+#.SUBDIRS: .
+
+.PHONY: all install clean x
+
+{% for scene in scenes %}
+# scene {{ scene.name }} duration={{scene.duration}} ips={{scene.ips}}
+{% for i in range(scene.duration*scene.ips) %}g_{{scene.name}}_{{i}}.mps \
+{% endfor %} : mounted/{{scene.name}}.mp
+    mpost --tex=latex g_{{scene.name}}
+
+{% endfor %}
+
+%.:%.mp
+	echo "run mpost"
+	mpost --tex=latex $<
+
+clean:
+	echo "clean"
+	rm -f *.svg *.mp4 *.log *.gif *-*.mp

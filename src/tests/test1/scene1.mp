@@ -30,4 +30,3 @@ fill A -- B -- C -- D -- cycle withcolor green ;
 
 
 enddef;
-

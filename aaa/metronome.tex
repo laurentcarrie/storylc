@@ -488,7 +488,7 @@ dt dt Tm nT mul { % pop
 Thanks to Martin Gieseking's \verb+dvisvgm+ utility~\cite{dvisvgm} that ships with all major \TeX{} distributions, package `animate' can produce self-contained animated SVG, with all the bits and pieces already included that are necessary to run in modern Web browsers as standalone files or as embedded objects within a Web page made of HTML. Animations have the same look and usability, including optional control buttons, as if they were embedded in a PDF document. Animated SVG even work on mobile devices.
 
 As \verb+dvisvgm+ is linked against the Ghostscript library, it can parse and convert embedded PostScript to inline SVG code. It is therefore compatible with the popular TikZ and PSTricks \LaTeX{} packages.
- 
+
 SVG is a single-page graphics format. Therefore, it is recommended to produce documents with a single animation per file or page. Thereafter, \verb+dvisvgm+ converts every page of the DVI input to a standalone animated SVG file. You may want to use the `standalone' document class for creating standalone SVG animations. Pass `\verb+dvisvgm+' as a global document class option. In this way, it gets conveyed to `animate' and other packages to be loaded, such as `graphicx' or TikZ.
 
 The following code may serve as a template for generating standalone animated SVG:
@@ -508,9 +508,9 @@ The following code may serve as a template for generating standalone animated SV
 %
 % \animategraphics{..}{...}{...}{...}
 %
-% or  
-%  
-% \begin{animateinline}{..} ... \end{animateinline} 
+% or
+%
+% \begin{animateinline}{..} ... \end{animateinline}
 %
 \end{document}
 \end{lstlisting}

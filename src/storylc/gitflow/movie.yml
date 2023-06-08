@@ -1,0 +1,11 @@
+scenes:
+  -
+    path: scene1.mp
+    name: scene1
+    duration: 30
+    ips: 1
+  -
+    path: scene2.mp
+    name: scene2
+    duration: 30
+    ips: 1

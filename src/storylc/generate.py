@@ -1,55 +1,93 @@
-import sys
-import traceback
-
-from storylc.model import Movie,Scene
 from pathlib import Path
 
-nbpoints = 10
+from jinja2 import Environment, PackageLoader, select_autoescape  # type:ignore
+from storylc.model import Movie, Scene
+from storylc.project_logs import a_logger
+
+here = Path(__file__).absolute().parent
 
 
-def generate_one(out:Path,name:str,t:float) -> None:
-    print(f"generating {str(out.absolute())}")
-    with out.open(mode='w') as fout :
-        fout.write(f"""
-outputformat := "svg";
-% outputtemplate := "%j-%c.svg";
-outputtemplate := "%j.svg";
-
-beginfig(1);       
-input {name} ;
-run({t}) ;
-
-endfig;
-
-end;
-""")
+def get_old(outfile: Path):
+    match outfile.exists():
+        case True:
+            return outfile.read_text()
+        case False:
+            return ""
 
 
+def generate_omakeroot(movie: Movie, out: Path) -> bool:
+    j_file: Path = here / "OMakeroot.jinja"
+    outfile = out / "OMakeroot"
+    env: Environment = Environment()
+    template = env.from_string(source=j_file.read_text(), globals={})
+    old_data = get_old(outfile)
+    new_data = template.render(movie=movie, srcdir=str(movie.root.absolute()))
+    if old_data == new_data:
+        a_logger.info(f"{str(outfile.absolute())} was not regenerated")
+        return True
+    outfile.write_text(data=new_data)
+    a_logger.info(f"{str(outfile.absolute())} was regenerated")
+    return False
+
+def generate_scene(movie:Movie,scene:Scene,out:Path):
+    j_file: Path = here / "scene.mp.jinja"
+    outfile = out / f"g_{scene.path}"
+    env: Environment = Environment()
+    template = env.from_string(source=j_file.read_text(), globals={})
+    old_data = get_old(outfile)
+    a_logger.info(movie.scenes)
+    new_data = template.render(movie=movie, scene=scene)
+    if old_data == new_data:
+        a_logger.info(f"{str(outfile.absolute())} was not regenerated")
+        return True
+    outfile.write_text(data=new_data)
+    a_logger.info(f"{str(outfile.absolute())} was regenerated")
+    return False
+
+def generate_omakefile(movie: Movie, out: Path) -> bool:
+    j_file: Path = here / "OMakefile.jinja"
+    outfile = out / "OMakefile"
+    env: Environment = Environment()
+    template = env.from_string(source=j_file.read_text(), globals={})
+    old_data = get_old(outfile)
+    a_logger.info(movie.scenes)
+    new_data = template.render(movie=movie, scenes=movie.scenes)
+    if old_data == new_data:
+        a_logger.info(f"{str(outfile.absolute())} was not regenerated")
+        return True
+    outfile.write_text(data=new_data)
+    a_logger.info(f"{str(outfile.absolute())} was regenerated")
+    return False
+
+def copy_mp(out:Path):
+    from_paths = [
+        "storylc/lib/slide.mp"
+    ]
+    def copy_one(source:str):
+        source_path: Path=here.parent/source
+        a_logger.info(f"copy {str(source_path.absolute())}")
+        target_path:Path=out/source
+        target_path.write_text(source_path.read_text())
+
+    (out/"storylc/lib").mkdir(exist_ok=True,parents=True)
+    list(map(lambda source:copy_one(source),from_paths))
+
+def copy_src(movie:Movie,out:Path):
+    def copy_one(scene:Scene):
+        source_path:Path= movie.root/scene.path
+        a_logger.info(f"copy {str(source_path.absolute())}")
+        target_path:Path=out/"mounted"/scene.path
+        target_path.write_text(source_path.read_text())
+
+    (out/"mounted").mkdir(exist_ok=True,parents=True)
+    list(map(lambda scene:copy_one(scene=scene),movie.scenes))
 
 
-def generate(name:str,ips:int,duration:int) :
-    for i in range(ips*duration):
-        generate_one(out=Path(f"{name}-{i}.mp"),name=name,t=float(i)/float(ips*duration-1))
 
-def make_svg_list(name:str,ips:int,duration:int):
-    return " ".join(list(map(lambda i: f"{name}-{i}.svg",range(ips*duration))))
-
-def make_mp_list(name:str,ips:int,duration:int):
-    return " ".join(list(map(lambda i: f"{name}-{i}.mp",range(ips*duration))))
-
-
-if __name__=="__main__":
-    try:
-        what=sys.argv[1]
-        name=sys.argv[2]
-        ips=int(sys.argv[3])
-        duration=int(sys.argv[4])
-        match what:
-            case 'G' : generate(name=name,duration=duration,ips=ips)
-            case 'L-svg' : print(make_svg_list(name=name,ips=ips,duration=duration))
-            case 'L-mp' : print(make_mp_list(name=name,ips=ips,duration=duration))
-            case _ : raise RuntimeError(f"no such case : {what}")
-    except:#noqa:E722
-        traceback.print_exc()
-        sys.exit(1)
-
+def generate(movie: Movie, out: Path):
+    out.mkdir(exist_ok=True)
+    generate_omakeroot(movie=movie, out=out)
+    generate_omakefile(movie=movie, out=out)
+    list(map(lambda scene:generate_scene(movie=movie,scene=scene,out=out),movie.scenes))
+    copy_mp(out)
+    copy_src(movie=movie,out=out)

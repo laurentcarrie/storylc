@@ -70,7 +70,7 @@ enddef;
 
 path pexp,ptaylor[];
 
-pexp = exp(xmin) 
+pexp = exp(xmin)
 for i:=xmin+diff step diff until xmax:
   .. exp(i)
 endfor;

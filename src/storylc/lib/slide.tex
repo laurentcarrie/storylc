@@ -2,10 +2,31 @@
 \usepackage{animate}
 \usepackage{graphicx}
 \usepackage{media9}
+\usepackage{animate}
+\usepackage{graphicx}
+\usepackage{media9}
 
 \begin{document}
 
+    \begin{center}
+        \animategraphics[
+            label=taylor,
+            controls, loop,
+            timeline=timeline.txt
+        ]{2}{slide_}{0}{10}
+        \mediabutton[
+        jsaction={
+            if(anim[’taylor’].isPlaying)
+            anim[’taylor’].pause();
+            else
+            anim[’taylor’].playFwd();
+        }
+        ]{\fbox{Play/Pause}}
+    \end{center}
+
+    blah blah du texte
     \includegraphics{slide_0}
+    encore du texte
     \clearpage
     \includegraphics{slide_1}
     \includegraphics{slide_2}

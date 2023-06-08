@@ -45,8 +45,7 @@ all.mp4 :  scene-1.mp4
 	ffmpeg -f concat -safe 0 -i infile.txt -c copy $@
 
 clean:
-	rm -f 
-	rm -f 
-	rm -f 
+	rm -f
+	rm -f
+	rm -f
 	rm -f all.mp4
-
