@@ -8,12 +8,15 @@
 
 \begin{document}
 
+{% for scene in movie.scenes %}
+
+\section{ {{ scene.name }} }
     \begin{center}
         \animategraphics[
             label=taylor,
             controls, loop,
             timeline=timeline.txt
-        ]{2}{g_scene1_}{0}{10}
+        ]{2}{g_{{ scene.name }}_}{0}{ {{ scene.duration * scene.ips }} }
         \mediabutton[
         jsaction={
             if(anim[’taylor’].isPlaying)
@@ -24,5 +27,6 @@
         ]{\fbox{Play/Pause}}
     \end{center}
 
+{% endfor %}
 
 \end{document}

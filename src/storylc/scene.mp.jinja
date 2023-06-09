@@ -6,14 +6,14 @@ outputformat := "mps";
 
 input boxes ;
 input TEX ;
-%input mounted/{{ scene.path.replace(".mp","") }} ;
+input mounted/{{ scene.path.replace(".mp","") }} ;
 
 
 
 for i:=0 upto {{ scene.duration * scene.ips }}:
 	beginfig(i);
-	    %scene(i) ;
-	    draw origin -- (10,10) ;
+	    scene(i) ;
+	    %draw origin -- (i,2*i) ;
 	endfig ;
 endfor;
 

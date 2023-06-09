@@ -1,19 +1,33 @@
 #.SUBDIRS: .
 
-.PHONY: all install clean x
+.PHONY: all install clean x all_mps pdf
 
 {% for scene in scenes %}
 # scene {{ scene.name }} duration={{scene.duration}} ips={{scene.ips}}
-{% for i in range(scene.duration*scene.ips) %}g_{{scene.name}}_{{i}}.mps \
-{% endfor %} : mounted/{{scene.name}}.mp
+mps_{{scene.name}}= {% for i in range(scene.duration*scene.ips) %}g_{{scene.name}}_{{i}}.mps \
+{% endfor %}
+
+$(mps_{{scene.name}}) : mounted/{{scene.name}}.mp
     mpost --tex=latex g_{{scene.name}}
 
 {% endfor %}
+
+
+all_mps={% for scene in scenes %}$(mps_{{scene.name}}){%endfor%}
+
+
+master.pdf : master.tex $(all_mps)
+    pdflatex master.tex
+    pdflatex master.tex
+
+pdf: master.pdf
 
 %.:%.mp
 	echo "run mpost"
 	mpost --tex=latex $<
 
 clean:
-	echo "clean"
-	rm -f *.svg *.mp4 *.log *.gif *-*.mp
+    echo "clean"
+{% for scene in scenes %}
+    rm -f $(mps_{{scene.name}})
+{%endfor%}

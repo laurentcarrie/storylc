@@ -59,6 +59,36 @@ def generate_omakefile(movie: Movie, out: Path) -> bool:
     a_logger.info(f"{str(outfile.absolute())} was regenerated")
     return False
 
+def generate_master_tex(movie: Movie, out: Path) -> bool:
+    j_file: Path = here / "master.tex.jinja"
+    outfile = out / "master.tex"
+    env: Environment = Environment()
+    template = env.from_string(source=j_file.read_text(), globals={})
+    old_data = get_old(outfile)
+    a_logger.info(movie.scenes)
+    new_data = template.render(movie=movie)
+    if old_data == new_data:
+        a_logger.info(f"{str(outfile.absolute())} was not regenerated")
+        return True
+    outfile.write_text(data=new_data)
+    a_logger.info(f"{str(outfile.absolute())} was regenerated")
+    return False
+
+def generate_timeline(movie: Movie, out: Path) -> bool:
+    j_file: Path = here / "timeline.jinja"
+    outfile = out / "timeline.txt"
+    env: Environment = Environment()
+    template = env.from_string(source=j_file.read_text(), globals={})
+    old_data = get_old(outfile)
+    a_logger.info(movie.scenes)
+    new_data = template.render(movie=movie, scenes=movie.scenes)
+    if old_data == new_data:
+        a_logger.info(f"{str(outfile.absolute())} was not regenerated")
+        return True
+    outfile.write_text(data=new_data)
+    a_logger.info(f"{str(outfile.absolute())} was regenerated")
+    return False
+
 def copy_mp(out:Path):
     from_paths = [
         "storylc/lib/slide.mp"
@@ -88,6 +118,8 @@ def generate(movie: Movie, out: Path):
     out.mkdir(exist_ok=True)
     generate_omakeroot(movie=movie, out=out)
     generate_omakefile(movie=movie, out=out)
+    generate_master_tex(movie=movie, out=out)
+    generate_timeline(movie=movie, out=out)
     list(map(lambda scene:generate_scene(movie=movie,scene=scene,out=out),movie.scenes))
     copy_mp(out)
     copy_src(movie=movie,out=out)
