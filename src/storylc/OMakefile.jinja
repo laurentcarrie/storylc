@@ -2,18 +2,7 @@
 
 .PHONY: all install clean x all_mps pdf
 
-{% for scene in scenes %}
-# scene {{ scene.name }} duration={{scene.duration}} ips={{scene.ips}}
-mps_{{scene.name}}= {% for i in range(scene.duration*scene.ips) %}g_{{scene.name}}_{{i}}.mps \
-{% endfor %}
-
-$(mps_{{scene.name}}) : mounted/{{scene.name}}.mp
-    mpost --tex=latex g_{{scene.name}}
-
-{% endfor %}
-
-
-all_mps={% for scene in scenes %}$(mps_{{scene.name}}){%endfor%}
+.SUBDIRS: {% for scene in movie.scenes %} tmp-{{scene.name}} {%endfor%}
 
 
 master.pdf : master.tex $(all_mps)
@@ -31,3 +20,12 @@ clean:
 {% for scene in scenes %}
     rm -f $(mps_{{scene.name}})
 {%endfor%}
+
+{% for (scene,start) in zip %}
+{% for i in range(scene.duration*scene.ips) %}
+scene_{{ start+i }}.mps : tmp-{{ scene.name }}/{{ scene.name }}_{{ i }}.mps
+    cp $< $@
+{% endfor %}
+{% endfor %}
+
+{% for i in nb_images %}

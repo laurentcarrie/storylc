@@ -17,13 +17,13 @@
             label={{ scene.name }},
             controls, loop,
             timeline=timeline.txt
-        ]{2}{g_{{ scene.name }}_}{ {{ start }} }{ {{ start+scene.duration * scene.ips }} }
+        ]{ {{scene.ips}} }{mps/scene_}{ {{ start }} }{ {{ start+scene.duration * scene.ips -1}} }
         \mediabutton[
         jsaction={
-            if(anim[’taylor’].isPlaying)
-            anim[’taylor’].pause();
+            if(anim[’{{scene.name}}’].isPlaying)
+            anim[’{{scene.name}}’].pause();
             else
-            anim[’taylor’].playFwd();
+            anim[’{{scene.name}}’].playFwd();
         }
         ]{\fbox{Play/Pause}}
     \end{center}

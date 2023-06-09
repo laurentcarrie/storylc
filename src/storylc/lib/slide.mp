@@ -97,5 +97,3 @@ enddef ;
 %		drawshadowed(a) ;
 %	endfig ;
 %endfor;
-
-

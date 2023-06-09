@@ -1,0 +1,18 @@
+#.SUBDIRS: .
+
+.PHONY: all install clean
+.DEFAULT: all
+
+rm -rf storylc
+mkdir -p storylc
+ln -s /home/laurent/work/storylc/src/storylc/lib storylc/lib
+
+all_mps= {% for i in range(scene.duration*scene.ips) %}{{scene.name}}_{{i}}.mps  {%endfor%}
+
+
+$(all_mps) : {{scene.name}}.mp
+    mpost --tex=latex {{scene.name}}
+
+all : $(all_mps)
+clean :
+    rm -rf $(all_mps)
