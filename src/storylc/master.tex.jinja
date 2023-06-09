@@ -8,15 +8,16 @@
 
 \begin{document}
 
-{% for scene in movie.scenes %}
+{% for (scene,start) in zip %}
+% start is {{ start }}
 
 \section{ {{ scene.name }} }
     \begin{center}
         \animategraphics[
-            label=taylor,
+            label={{ scene.name }},
             controls, loop,
             timeline=timeline.txt
-        ]{2}{g_{{ scene.name }}_}{0}{ {{ scene.duration * scene.ips }} }
+        ]{2}{g_{{ scene.name }}_}{ {{ start }} }{ {{ start+scene.duration * scene.ips }} }
         \mediabutton[
         jsaction={
             if(anim[’taylor’].isPlaying)

@@ -1,0 +1,65 @@
+# this is the dev version
+# the integrator may change/add/remove handlers, so logs can be outputed to some convenient place for grafana/datadog/sentry/...
+version: 1
+disable_existing_loggers: False
+formatters:
+    simple:
+        format: '%(name)s> %(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s'
+
+handlers:
+
+    console:
+        class: logging.StreamHandler
+        level: INFO
+        formatter: simple
+        stream: ext://sys.stdout
+
+    info_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        level: INFO
+        formatter: simple
+        filename: logs/info.log
+        maxBytes: 10485760 # 10MB
+        backupCount: 20
+        encoding: utf8
+        delay: True
+
+    error_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        level: ERROR
+        formatter: simple
+        filename: logs/errors.log
+        maxBytes: 10485760 # 10MB
+        backupCount: 20
+        encoding: utf8
+        delay: True
+    exception_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        level: ERROR
+        formatter: simple
+        filename: logs/exceptions.log
+        maxBytes: 10485760 # 10MB
+        backupCount: 20
+        encoding: utf8
+        delay: True
+
+loggers:
+    error-topic:
+        level: ERROR
+        handlers: [console, info_file_handler, error_file_handler]
+        propagate: no
+
+    exception-topic:
+        level: ERROR
+        handlers: [console, info_file_handler, exception_file_handler]
+        propagate: no
+
+    A-topic:
+        level: INFO
+        handlers: [console, info_file_handler, error_file_handler]
+        propagate: no
+
+    B-topic:
+        level: INFO
+        handlers: [console, info_file_handler, error_file_handler]
+        propagate: no

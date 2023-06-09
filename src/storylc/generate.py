@@ -1,3 +1,4 @@
+from functools import reduce
 from pathlib import Path
 
 from jinja2 import Environment, PackageLoader, select_autoescape  # type:ignore
@@ -66,7 +67,19 @@ def generate_master_tex(movie: Movie, out: Path) -> bool:
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
     a_logger.info(movie.scenes)
-    new_data = template.render(movie=movie)
+    def make_starts() :
+        def rec_f(scenes,starts):
+            if scenes==[]:
+                return starts
+            scene=scenes[0]
+            scenes=scenes[1:]
+            starts = starts + [ starts[-1]+scene.duration*scene.ips]
+            return rec_f(scenes,starts)
+        return rec_f(movie.scenes,[0])
+    starts=make_starts()
+    assert(len(starts)==len(movie.scenes)+1)
+    new_data = template.render(zip=zip(movie.scenes,starts))
+
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True
@@ -81,7 +94,8 @@ def generate_timeline(movie: Movie, out: Path) -> bool:
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
     a_logger.info(movie.scenes)
-    new_data = template.render(movie=movie, scenes=movie.scenes)
+    nb_points = reduce(lambda a,b:a+b,list(map(lambda scene:scene.duration*scene.ips,movie.scenes)),0)
+    new_data = template.render(nb_points=nb_points)
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True

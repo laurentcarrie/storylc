@@ -12,8 +12,7 @@ input mounted/{{ scene.path.replace(".mp","") }} ;
 
 for i:=0 upto {{ scene.duration * scene.ips }}:
 	beginfig(i);
-	    scene(i) ;
-	    %draw origin -- (i,2*i) ;
+	    scene(i,{{scene.duration}},{{scene.ips}}) ;
 	endfig ;
 endfor;
 
