@@ -62,6 +62,7 @@ def generate_scene(movie: Movie, scene: Scene, out: Path):
 
 
 def generate_omakefile(movie: Movie, out: Path) -> bool:
+    a_logger.info("generate master OMakefile")
     j_file: Path = here / "OMakefile.jinja"
     outfile = out / "OMakefile"
     env: Environment = Environment()
@@ -69,8 +70,13 @@ def generate_omakefile(movie: Movie, out: Path) -> bool:
     old_data = get_old(outfile)
     a_logger.info(movie.scenes)
     starts = make_starts(movie)
-    nb_images=starts[-1]
-    new_data = template.render(movie=movie, scenes=movie.scenes,zip=zip(movie.scenes,starts),nb_images=nb_images)
+    nb_images = starts[-1]
+    new_data = template.render(
+        movie=movie,
+        scenes=movie.scenes,
+        zip=zip(movie.scenes, starts),
+        nb_images=nb_images,
+    )
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True
@@ -78,7 +84,9 @@ def generate_omakefile(movie: Movie, out: Path) -> bool:
     a_logger.info(f"{str(outfile.absolute())} was regenerated")
     return False
 
+
 def generate_omakefile_scene(scene: Scene, out: Path) -> bool:
+    a_logger.info(f"generate omakefile for scene {scene.name}")
     j_file: Path = here / "OMakefile_scene.jinja"
     outfile = out / f"tmp-{scene.name}/OMakefile"
     env: Environment = Environment()
@@ -93,7 +101,26 @@ def generate_omakefile_scene(scene: Scene, out: Path) -> bool:
     return False
 
 
+def generate_omakefile_mps(movie: Movie, out: Path) -> bool:
+    a_logger.info("generate omakefile mps")
+    j_file: Path = here / "OMakefile_mps.jinja"
+    outfile = out / "mps/OMakefile"
+    (outfile.parent).mkdir(exist_ok=True, parents=True)
+    env: Environment = Environment()
+    template = env.from_string(source=j_file.read_text(), globals={})
+    old_data = get_old(outfile)
+    starts = make_starts(movie)
+    new_data = template.render(zip=zip(movie.scenes, starts), nb_images=starts[-1])
+    if old_data == new_data:
+        a_logger.info(f"{str(outfile.absolute())} was not regenerated")
+        return True
+    outfile.write_text(data=new_data)
+    a_logger.info(f"{str(outfile.absolute())} was regenerated")
+    return False
+
+
 def generate_master_tex(movie: Movie, out: Path) -> bool:
+    a_logger.info("generate master.tex")
     j_file: Path = here / "master.tex.jinja"
     outfile = out / "master.tex"
     env: Environment = Environment()
@@ -122,7 +149,7 @@ def generate_timeline(movie: Movie, out: Path) -> bool:
     old_data = get_old(outfile)
     a_logger.info(movie.scenes)
     starts = make_starts(movie)
-    nb_images=starts[-1]
+    nb_images = starts[-1]
     new_data = template.render(nb_images=nb_images)
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
@@ -160,6 +187,7 @@ def generate(movie: Movie, out: Path):
     out.mkdir(exist_ok=True)
     generate_omakeroot(movie=movie, out=out)
     generate_omakefile(movie=movie, out=out)
+    generate_omakefile_mps(movie=movie, out=out)
     generate_master_tex(movie=movie, out=out)
     generate_timeline(movie=movie, out=out)
     list(

@@ -17,7 +17,8 @@ vardef scene(expr i,duration,ips)=
 		o := dir(j*360) * 2cm ;
 		%o := dir(45) * 2cm ;
 		b:= fullcircle scaled .5cm shifted o ;
-		fill b withcolor .9white ;
+		k:=i / duration / ips ;
+		fill b withcolor (k,1-k,0) ;
 		%label("x",o) ;
 		label(decimal j,origin) ;
 		label(decimal i,(-5cm,0)) ;

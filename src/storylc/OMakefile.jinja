@@ -1,31 +1,15 @@
-#.SUBDIRS: .
+.SUBDIRS: mps {% for scene in movie.scenes %} tmp-{{scene.name}} {%endfor%}
 
-.PHONY: all install clean x all_mps pdf
+.PHONY: all install clean x pdf
 
 .SUBDIRS: {% for scene in movie.scenes %} tmp-{{scene.name}} {%endfor%}
 
+pdf: master.pdf
+
+mkdir -p mps
+
+all_mps= {% for i in range(nb_images) %} mps/scene_{{i}}.mps {%endfor%}
 
 master.pdf : master.tex $(all_mps)
     pdflatex master.tex
     pdflatex master.tex
-
-pdf: master.pdf
-
-%.:%.mp
-	echo "run mpost"
-	mpost --tex=latex $<
-
-clean:
-    echo "clean"
-{% for scene in scenes %}
-    rm -f $(mps_{{scene.name}})
-{%endfor%}
-
-{% for (scene,start) in zip %}
-{% for i in range(scene.duration*scene.ips) %}
-scene_{{ start+i }}.mps : tmp-{{ scene.name }}/{{ scene.name }}_{{ i }}.mps
-    cp $< $@
-{% endfor %}
-{% endfor %}
-
-{% for i in nb_images %}
