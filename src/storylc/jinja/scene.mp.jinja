@@ -1,0 +1,19 @@
+prologues:=3;
+outputtemplate := "frame_%c.mps";
+outputformat := "mps";
+
+
+
+input boxes ;
+input TEX ;
+input mounted/{{ animation.path.replace(".mp","") }} ;
+
+
+
+for i:=0 upto {{ animation.duration * animation.ips }}:
+	beginfig(i);
+	    main(i,{{animation.duration}},{{animation.ips}}) ;
+	endfig ;
+endfor;
+
+end.

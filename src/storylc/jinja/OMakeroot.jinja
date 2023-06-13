@@ -1,0 +1,19 @@
+srcdir = {{ movie.root.absolute() }}
+prefix = {{ prefix }}xx
+DefineCommandVars()
+public.srcdir = $(dir $(srcdir))
+public.libdir = $(dir {{libdir}}/storylclib)
+
+CREATE_SUBDIRS=true
+
+{% for animation in movie.animations %}
+mkdir -p tmp-animation-{{animation.name}}
+vmount(-c, $(srcdir), tmp-animation-{{animation.name}}/yyy)
+{% endfor %}
+
+vmount(-c,$(libdir),.)
+
+
+mkdir -p $(prefix)
+
+.SUBDIRS: .

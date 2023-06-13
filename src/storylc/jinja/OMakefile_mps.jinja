@@ -1,0 +1,20 @@
+.PHONY: all
+
+
+pdf: master.pdf
+
+mkdir -p mps
+
+{% for (scene,start) in zip %}
+{% for i in range(scene.duration*scene.ips) %}
+scene_{{ start+i }}.mps : ../tmp-{{ scene.name }}/a_{{ scene.name }}_{{ i }}.mps
+   cp $< $@
+{% endfor %}
+
+{% for i in range(scene.duration*scene.ips) %}
+scene_{{ start+i + nb_images }}.mps : ../tmp-{{ scene.name }}/b_{{ scene.name }}_{{ i }}.mps
+   cp $< $@
+{% endfor %}
+
+
+{% endfor %}

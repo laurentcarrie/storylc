@@ -1,0 +1,18 @@
+.PHONY: all pdf mps
+
+
+mps_files = {% for i in range(animation.duration*animation.ips) %}frame_{{i}}.mps {% endfor %}
+
+rm -f storylclib
+ln -s {{libdir}}/storylclib storylclib
+
+$(mps_files) : animation.mp
+    mpost --tex=latex $<
+
+mps : $(mps_files)
+
+pdf : animation.pdf
+
+animation.pdf : animation.tex $(mps_files)
+    lualatex animation.tex
+    lualatex animation.tex

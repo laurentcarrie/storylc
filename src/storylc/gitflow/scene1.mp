@@ -1,10 +1,11 @@
 input boxes ;
 input TEX ;
 %input latexmp ;
-input storylc/lib/slide ;
+input storylclib/slide ;
 
 
-vardef scene(expr i,duration,ips)=
+
+vardef main(expr i,duration,ips)=
 		mygrid ;
 		%transform t ;
 		%t = identity shifted (0cm,3cm) scaled 1 ;
@@ -18,9 +19,14 @@ vardef scene(expr i,duration,ips)=
 		%o := dir(45) * 2cm ;
 		b:= fullcircle scaled .5cm shifted o ;
 		k:=i / duration / ips ;
+		t:=i/ips ;
 		fill b withcolor (k,1-k,0) ;
-		%label("x",o) ;
-		label(decimal j,origin) ;
-		label(decimal i,(-5cm,0)) ;
+enddef ;
 
+vardef main_b(expr i,duration,ips)=
+		k:=i / duration / ips ;
+		t:=i/ips ;
+        label("i=" & decimal i & "", (-5cm, 0));
+        label("k=" & decimal k & "", (-5cm, -.3cm));
+        label("t=" & decimal t & " s", (-5cm, -.6cm));
 enddef ;

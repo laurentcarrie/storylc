@@ -1,0 +1,13 @@
+#.SUBDIRS: mps {% for scene in movie.scenes %} tmp-{{scene.name}} {%endfor%}
+
+.PHONY: all install clean x pdf
+
+.SUBDIRS: {% for animation in movie.animations %} tmp-animation-{{animation.name}} {%endfor%}
+
+pdf: master.pdf
+
+mkdir -p mps
+
+
+#master.pdf : master.tex $(all_mps)
+#    lualatex master.tex

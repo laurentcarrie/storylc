@@ -1,11 +1,16 @@
 scenes:
   -
-    path: scene1.mp
     name: scene1
+    layers:
+      - name: aaa
+        animations:
+            - scene1
+
+animations:
+  -
+    name: scene1
+    path: scene1.mp
+    overlays: 2
     duration: 10
     ips: 20
-  -
-    path: scene2.mp
-    name: scene2
-    duration: 30
-    ips: 1
+
