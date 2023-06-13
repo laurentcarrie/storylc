@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, List, Set
+from typing import Any, List, Set, Tuple
 
 class Clear:
     __match_args__: Any
@@ -18,6 +18,13 @@ class WhatToDo:
     what: str
     def __init__(self, what: str) -> None: ...
 
+@dataclass(eq=True, frozen=True)
+class AnimationTimeLine:
+    __match_args__: Any
+    animation_name: str
+    timeline: List[float]
+    def __init__(self, animation_name: str, timeline: List[float]) -> None: ...
+
 class Animation:
     __match_args__: Any
     name: str
@@ -31,7 +38,7 @@ class Layer:
     __match_args__: Any
     name: str
     animations: List[str]
-    def __init__(self, name: str, animations: List[str]) -> None: ...
+    def __init__(self, name: str, animations: List[AnimationTimeLine]) -> None: ...
 
 class Scene:
     __match_args__: Any
@@ -46,6 +53,8 @@ class Movie:
     scenes: List[Scene]
     animations: List[Animation]
     root: Path = Path(".")
-    def __init__(self, scenes: List[Scene], animations:List[Animation],root: Path = Path(".")) -> None: ...
+    def __init__(
+        self, scenes: List[Scene], animations: List[Animation], root: Path = Path(".")
+    ) -> None: ...
     @property
-    def animations(self) -> Set[Animation]: ...
+    def nb_images(self) -> int: ...

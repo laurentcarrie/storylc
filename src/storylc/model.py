@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from functools import reduce
 from pathlib import Path
-from typing import Any, Callable, List, Set
+from typing import Any, Callable, Iterator, List, Set, Tuple
 
 
 @dataclass(eq=True, frozen=True)
@@ -31,21 +31,29 @@ class WhatToDo:
 
 
 @dataclass(eq=True, frozen=True)
+class AnimationTimeLine:
+    animation_name: str
+    timeline: List[float]
+
+
+@dataclass(eq=True, frozen=True)
 class Layer:
     name: str
-    animations: List[str]
+    animations: List[AnimationTimeLine]
+
 
 @dataclass(eq=True, frozen=True)
 class Scene:
     name: str
     layers: List[Layer]
+
     @property
-    def animations(self) -> Set[Animation]:
-        return reduce(
-            lambda a, b: a | b,
-            map(lambda layer: set(layer.animations), self.layers),
-            set(),
+    def animations(self) -> Set[str]:
+        seed: List[AnimationTimeLine] = []
+        llanimations: List[AnimationTimeLine] = reduce(
+            list.__add__, list(map(lambda layer: layer.animations, self.layers)), seed
         )
+        return set(map(lambda atl: atl.animation_name, llanimations))
 
 
 @dataclass(eq=True, frozen=True)
@@ -53,3 +61,14 @@ class Movie:
     scenes: List[Scene]
     animations: List[Animation]
     root: Path = Path(".")
+
+    @property
+    def nb_images(self) -> int:
+        return reduce(
+            lambda a, b: a + b,
+            map(
+                lambda animation: animation.duration * animation.ips + 1,
+                self.animations,
+            ),
+            0,
+        )

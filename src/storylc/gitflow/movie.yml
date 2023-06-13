@@ -4,13 +4,18 @@ scenes:
     layers:
       - name: aaa
         animations:
-            - scene1
+            - animation_name: anim1
+              timeline: [0,0,10,10]
+
 
 animations:
   -
-    name: scene1
-    path: scene1.mp
-    overlays: 2
+    name: anim1
+    path: anim1.mp
     duration: 10
     ips: 20
-
+  -
+    name: anim2
+    path: anim1.mp
+    duration: 1
+    ips: 2

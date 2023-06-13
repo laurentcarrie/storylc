@@ -1,20 +1,13 @@
-.PHONY: all
+.PHONY: all mps
 
 
-pdf: master.pdf
+mps_files= {% for i in range(movie.nb_images)%} frame_{{i}}.mps {%endfor%}
 
-mkdir -p mps
+mps : $(mps_files)
 
-{% for (scene,start) in zip %}
-{% for i in range(scene.duration*scene.ips) %}
-scene_{{ start+i }}.mps : ../tmp-{{ scene.name }}/a_{{ scene.name }}_{{ i }}.mps
-   cp $< $@
+{% for animation,start in zip %}
+{% for j in range(animation.duration*animation.ips+1) %}
+frame_{{j+start}}.mps : ../tmp-animation-{{animation.name}}/frame_{{j}}.mps
+    cp $< $@
 {% endfor %}
-
-{% for i in range(scene.duration*scene.ips) %}
-scene_{{ start+i + nb_images }}.mps : ../tmp-{{ scene.name }}/b_{{ scene.name }}_{{ i }}.mps
-   cp $< $@
-{% endfor %}
-
-
 {% endfor %}

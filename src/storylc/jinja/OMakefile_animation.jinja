@@ -1,7 +1,7 @@
-.PHONY: all pdf mps
+.PHONY: all pdf mps clean
 
 
-mps_files = {% for i in range(animation.duration*animation.ips) %}frame_{{i}}.mps {% endfor %}
+mps_files = {% for i in range(animation.duration*animation.ips+1) %}frame_{{i}}.mps {% endfor %}
 
 rm -f storylclib
 ln -s {{libdir}}/storylclib storylclib
@@ -16,3 +16,6 @@ pdf : animation.pdf
 animation.pdf : animation.tex $(mps_files)
     lualatex animation.tex
     lualatex animation.tex
+
+clean:
+    rm -f $(mps_files) animation.pdf

@@ -1,0 +1,32 @@
+\documentclass[11pt]{article}
+\usepackage{animate}
+\usepackage{graphicx}
+\usepackage{media9}
+\usepackage{animate}
+\usepackage{graphicx}
+\usepackage{media9}
+\usepackage{luamplib}
+
+
+\begin{document}
+\mplibtextextlabel{enable}
+
+\section{ {{ scene.name }} }
+    \begin{center}
+        \animategraphics[
+            label={{ scene.name }},
+            controls, loop,
+            timeline=timeline.txt
+        ]{ 20}{../mps/frame_}{ {{ 0 }} }{ {{ 200 }} }
+        \mediabutton[
+        jsaction={
+            if(anim[’{{scene.name}}’].isPlaying)
+            anim[’{{scene.name}}’].pause();
+            else
+            anim[’{{scene.name}}’].playFwd();
+        }
+        ]{\fbox{Play/Pause}}
+    \end{center}
+
+
+\end{document}

@@ -32,16 +32,22 @@ def _generate(out: str, yml: str):
         try:
             data = yaml.load(yml_path.read_text(), yaml.FullLoader)
         except Exception as e:
-            a_logger.error(f"could not correctly load yaml file {yml_path.absolute()}, please check it")
+            a_logger.error(
+                f"could not correctly load yaml file {yml_path.absolute()}, please check it"
+            )
             raise e
 
         try:
             movie: Movie = from_dict(data_class=Movie, data=data)
         except Exception as e:
-            a_logger.error(f"could not convert yml data to a Movie object, please check fields")
+            a_logger.error(
+                "could not convert yml data to a Movie object, please check fields"
+            )
             raise e
 
-        movie = Movie(root=yml_path.parent, scenes=movie.scenes,animations=movie.animations)
+        movie = Movie(
+            root=yml_path.parent, scenes=movie.scenes, animations=movie.animations
+        )
         a_logger.info(movie)
         generate(movie=movie, out=Path(out))
     except:  # noqa:E722
