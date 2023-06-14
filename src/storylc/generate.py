@@ -221,9 +221,9 @@ def generate_timeline_scene(scene: Scene, out: Path) -> bool:
     env: Environment = Environment()
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
-    animations:List[Animation] = list(map(lambda a:animation_of_name(a.animation_name),
-                                          scene.animations))
-    new_data = template.render(scene=scene,zip=zip(scene.animations,animations))
+    # animations:List[Animation] = list(map(lambda a:animation_of_name(a.name),
+    #                                       scene.animations))
+    new_data = template.render(scene=scene,zip=zip(scene.animations,[]))
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True
