@@ -24,12 +24,12 @@ animations:
   - name: anim1
     path: anim1.mp
     duration: 20
-    ips: 10
+    ips: 20
   - name: anim2
     path: anim2.mp
     duration: 20
-    ips: 10
+    ips: 20
   - name: grid
     path: grid.mp
     duration: 20
-    ips: 10
+    ips: 20

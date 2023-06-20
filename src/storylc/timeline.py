@@ -19,19 +19,33 @@ def image_id_of_triplets(movie: Movie, scene: Scene) -> Iterator[Tuple[int, str,
 
 def timeline_of_scene(movie: Movie, scene: Scene) -> List[str]:
 
-    ips = 10  # 10 images per second
+    # first int : the mps number
+    # second str : the name of the animation
+    # third int : the frame number in the anim
+    triplets: List[Tuple[int, str, int]] = list(
+        image_id_of_triplets(movie=movie, scene=scene)
+    )
 
-    def row_of_layer(i: int, layer: Layer) -> str:
-        return ",".join(
+    def layer_of_anim_and_row(row: int, anim_name: str) -> str:
+        now: List[Tuple[int, str, int]] = list(
+            filter(lambda x: x[2] == row and x[1] == anim_name, triplets)
+        )
+        assert len(now) == 1
+        return str(now[0][0])
+
+    ips = 20
+
+    def one_row(i: int) -> str:
+        layer: Layer  # noqa:F842
+        return ";".join(
             list(
                 map(
-                    lambda anim: str(i + anim.start),
-                    animations_of_layer(movie=movie, layer=layer),
+                    lambda layer: layer_of_anim_and_row(
+                        row=i, anim_name=layer.animations[0].animation_name
+                    ),
+                    scene.layers,
                 )
             )
         )
 
-    def row(i: int) -> str:
-        return ";".join(list(map(lambda layer: row_of_layer(i, layer), scene.layers)))
-
-    return list(map(row, range(scene.duration * ips)))
+    return list(map(one_row, range(scene.duration * ips)))
