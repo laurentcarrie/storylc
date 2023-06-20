@@ -1,7 +1,8 @@
 .PHONY: all pdf mps clean
 
+mkdir -p mps
 
-mps_files = {% for i in range(animation.duration*animation.ips+1) %}frame_{{i}}.mps {% endfor %}
+mps_files = {% for i in range(animation.duration*animation.ips+1) %}mps/frame_{{i}}.mps {% endfor %}
 
 rm -f storylclib
 ln -s {{libdir}}/storylclib storylclib

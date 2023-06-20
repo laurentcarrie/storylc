@@ -22,8 +22,9 @@ class WhatToDo:
 class AnimationTimeLine:
     __match_args__: Any
     animation_name: str
-    timeline: List[float]
-    def __init__(self, animation_name: str, timeline: List[float]) -> None: ...
+    # timeline_x: List[float]
+    # timeline_y: List[float]
+    def __init__(self, animation_name: str) -> None: ...
 
 class Animation:
     __match_args__: Any
@@ -31,8 +32,13 @@ class Animation:
     duration: int
     ips: int
     path: str
+    start: int = -1
 
-    def __init__(self, name: str, duration: int, ips: int, path: str) -> None: ...
+    def __init__(
+        self, name: str, duration: int, ips: int, path: str, start: int = -1
+    ) -> None: ...
+    @property
+    def end(self) -> int: ...
 
 class Layer:
     __match_args__: Any
@@ -43,8 +49,9 @@ class Layer:
 class Scene:
     __match_args__: Any
     name: str
+    duration: int
     layers: List[Layer]
-    def __init__(self, name: str, layers: List[Layer]) -> None: ...
+    def __init__(self, name: str, duration: int, layers: List[Layer]) -> None: ...
     @property
     def animations(self) -> Set[Animation]: ...
 

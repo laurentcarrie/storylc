@@ -2,7 +2,7 @@
 
 .PHONY: all install clean x pdf
 
-.SUBDIRS: mps {% for animation in movie.animations %} tmp-animation-{{animation.name}} {%endfor%} {% for scene in movie.scenes %} tmp-scene-{{scene.name}} {%endfor%}
+.SUBDIRS: {% for animation in movie.animations %} tmp-animation-{{animation.name}} {%endfor%} {% for scene in movie.scenes %} tmp-scene-{{scene.name}} {%endfor%}
 
 pdf_files= {% for animation in movie.animations %} animation-{{animation.name}}.pdf {% endfor %}
 

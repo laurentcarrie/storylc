@@ -11,6 +11,12 @@ class Animation:
     duration: int
     ips: int
     path: str
+    start: int = -1
+
+    # end exclusive
+    @property
+    def end(self) -> int:
+        return self.start + self.duration * self.ips + 1
 
 
 @dataclass(eq=True, frozen=True)
@@ -33,7 +39,9 @@ class WhatToDo:
 @dataclass(eq=True, frozen=True)
 class AnimationTimeLine:
     animation_name: str
-    timeline: List[float]
+    # duration: int
+    # timeline_x: List[float]
+    # timeline_y: List[float]
 
 
 @dataclass(eq=True, frozen=True)
@@ -45,6 +53,7 @@ class Layer:
 @dataclass(eq=True, frozen=True)
 class Scene:
     name: str
+    duration: int
     layers: List[Layer]
 
     @property
@@ -67,7 +76,7 @@ class Movie:
         return reduce(
             lambda a, b: a + b,
             map(
-                lambda animation: animation.duration * animation.ips + 1,
+                lambda animation: animation.end - animation.start,
                 self.animations,
             ),
             0,

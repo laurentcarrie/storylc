@@ -1,7 +1,13 @@
 .PHONY: all pdf mps clean
 
-mps_files= {% for i in range(movie.nb_images) %} ../mps/frame_{{i}}.mps {% endfor %}
+mkdir -p mps
 
+mps_files= {% for i in range(scene.duration * 20 ) %} mps/frame_{{i}}.mps {% endfor %}
+
+{% for count_in_scene,anim_name,count_in_anim in zip %}
+mps/frame_{{count_in_scene}}.mps : ../tmp-animation-{{ anim_name }}/mps/frame_{{count_in_anim}}.mps
+    ln-or-cp $< $@
+{% endfor %}
 
 mps : $(mps_files)
 

@@ -1,10 +1,11 @@
-from functools import reduce
 from pathlib import Path
-from typing import List
+from typing import List, Tuple, cast, Iterator
 
 from jinja2 import Environment, PackageLoader, select_autoescape  # type:ignore
+from storylc.getters import animations_of_layer
 from storylc.model import Animation, Movie, Scene
 from storylc.project_logs import a_logger
+from storylc.timeline import timeline_of_scene
 
 here = Path(__file__).absolute().parent
 
@@ -17,22 +18,85 @@ def get_old(outfile: Path):
             return ""
 
 
-def animation_of_name(movie:Movie,name:str) -> Animation:
-    for a in movie.animations:
-        if a.name == name:
-            return a
-    raise RuntimeError(f"no such animation : '{name}'")
-
-def make_starts(movie: Movie) -> List[int]:
+def make_starts(animations: List[Animation]) -> List[int]:
     def rec_f(animations: List[Animation], starts: List[int]) -> List[int]:
         if animations == []:
             return starts
         animation = animations[0]
         animations = animations[1:]
-        starts = starts + [starts[-1] + animation.duration * animation.ips + 1]
+        starts = starts + [starts[-1] + animation.end + 1]
         return rec_f(animations, starts)
 
-    return rec_f(movie.animations, [0])
+    return rec_f(animations, [0])
+
+
+# def check_interpol(al: AnimationTimeLine):
+#     if len(al.timeline_x) != len(al.timeline_y):
+#         raise RuntimeError("len of vector should be even")
+#
+#     for i in range(1, len(al.timeline_x) - 1):
+#         if al.timeline_x[i] <= al.timeline_x[i - 1]:
+#             raise RuntimeError("interpol should be monotonic")
+
+
+# def interpol(al: AnimationTimeLine, t: float) -> float:
+#     for i in range(1, len(al.timeline_x) - 1):
+#         if al.timeline_x[i] > t:
+#             k = (t - al.timeline_x[i - 1]) / (al.timeline_x[i] - al.timeline_x[i - 1])
+#             assert k >= 0
+#             assert k <= 1
+#             return al.timeline_y[i - 1] + k * (al.timeline_y[i] - al.timeline_y[i - 1])
+#
+#     raise RuntimeError("bad t value")
+#     return 0.0
+
+
+# def make_layer_timelines(movie: Movie, layer: Layer) -> str:
+#     al: AnimationTimeLine
+#     duration = 10
+#     ips = 10
+#     anims: List[Animation] = list(
+#         map(
+#             lambda al: get_animation(movie=movie, name=al.animation_name),
+#             layer.animations,
+#         )
+#     )
+#
+#     def row(i: int) -> str:
+#         t: float = float(i * ips)
+#         anim: AnimationTimeLine
+#         v = list(map(lambda anim: str(int(interpol(al=anim, t=t))), anims))
+#         return ",".join(v)
+#
+#     return ""
+
+
+def fix_start(movie) -> Movie:
+    starts = make_starts(movie.animations)
+
+    def fix_anim(anim: Animation, start: int) -> Animation:
+        return Animation(
+            name=anim.name,
+            duration=anim.duration,
+            ips=anim.ips,
+            path=anim.path,
+            start=start,
+        )
+
+    animations: List[Animation] = list(
+        map(
+            lambda x: fix_anim(*x),
+            cast(List[Tuple[Animation, int]], zip(movie.animations, starts)),
+        )
+    )
+    return Movie(scenes=movie.scenes, animations=animations, root=movie.root)
+
+
+# def animation_of_name(movie: Movie, name: str) -> Animation:
+#     for a in movie.animations:
+#         if a.name == name:
+#             return a
+#     raise RuntimeError(f"no such animation : '{name}'")
 
 
 def generate_omakeroot(movie: Movie, out: Path) -> bool:
@@ -76,12 +140,10 @@ def generate_omakefile(movie: Movie, out: Path) -> bool:
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
     a_logger.info(movie.scenes)
-    starts = make_starts(movie)
     # nb_images = starts[-1]
     new_data = template.render(
         movie=movie,
         scenes=movie.scenes,
-        zip=zip(movie.scenes, starts),
         # nb_images=nb_images,
     )
     if old_data == new_data:
@@ -98,9 +160,16 @@ def generate_omakefile_scene(movie: Movie, scene: Scene, out: Path) -> bool:
     outfile = out / f"tmp-scene-{scene.name}/OMakefile"
     (outfile.parent).mkdir(exist_ok=True)
     env: Environment = Environment()
+
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
-    new_data = template.render(movie=movie, scene=scene)
+    new_data = template.render(
+        movie=movie,
+        scene=scene,
+        zip=list(get_triplets())
+        # zip=zip(range(len(scene.animations)), scene.animations),
+    )
+
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True
@@ -143,7 +212,7 @@ def generate_animation_tex(animation: Animation, out: Path) -> bool:
     return False
 
 
-def generate_scene_tex(scene: Scene, out: Path) -> bool:
+def generate_scene_tex(movie: Movie, scene: Scene, out: Path) -> bool:
     a_logger.info(f"generate master.tex for scene {scene.name}")
     j_file: Path = here / "jinja/scene.tex.jinja"
     outfile = out / f"tmp-scene-{scene.name}/scene.tex"
@@ -151,7 +220,7 @@ def generate_scene_tex(scene: Scene, out: Path) -> bool:
     env: Environment = Environment()
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
-    new_data = template.render(libdir=str(here.absolute()), scene=scene)
+    new_data = template.render(libdir=str(here.absolute()), movie=movie, scene=scene)
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True
@@ -168,8 +237,7 @@ def generate_omakefile_mps(movie: Movie, out: Path) -> bool:
     env: Environment = Environment()
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
-    starts = make_starts(movie)
-    new_data = template.render(movie=movie, zip=zip(movie.animations, starts))
+    new_data = template.render(movie=movie, zip=zip(movie.animations))
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True
@@ -187,10 +255,7 @@ def generate_master_tex(movie: Movie, out: Path) -> bool:
     old_data = get_old(outfile)
     a_logger.info(movie.scenes)
 
-    starts = make_starts(movie)
-    a_logger.info(starts)
-    # assert len(starts) == len(movie.scenes) + 1
-    new_data = template.render(zip=zip(movie.scenes, starts))
+    new_data = template.render(movie.scenes)
 
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
@@ -215,7 +280,7 @@ def generate_timeline_animation(animation: Animation, out: Path) -> bool:
     return False
 
 
-def generate_timeline_scene(scene: Scene, out: Path) -> bool:
+def generate_timeline_scene(movie: Movie, scene: Scene, out: Path) -> bool:
     j_file: Path = here / "jinja/timeline_scene.jinja"
     outfile = out / f"tmp-scene-{scene.name}/timeline.txt"
     env: Environment = Environment()
@@ -223,7 +288,8 @@ def generate_timeline_scene(scene: Scene, out: Path) -> bool:
     old_data = get_old(outfile)
     # animations:List[Animation] = list(map(lambda a:animation_of_name(a.name),
     #                                       scene.animations))
-    new_data = template.render(scene=scene,zip=zip(scene.animations,[]))
+    rows: List[str] = timeline_of_scene(movie=movie, scene=movie.scenes[0])
+    new_data = template.render(rows=rows)
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True
@@ -275,10 +341,10 @@ def generate_for_animation(movie: Movie, animation: Animation, out: Path) -> Non
 
 def generate_for_scene(movie: Movie, scene: Scene, out: Path) -> None:
     generate_omakefile_scene(movie=movie, scene=scene, out=out)
-    generate_scene_tex(scene=scene, out=out)
+    generate_scene_tex(movie=movie, scene=scene, out=out)
     # generate_animation_tex(animation=animation, out=out)
     # generate_animation(movie=movie, animation=animation, out=out)
-    generate_timeline_scene(scene=scene, out=out)
+    generate_timeline_scene(movie=movie, scene=scene, out=out)
 
 
 def generate(movie: Movie, out: Path):
@@ -299,7 +365,7 @@ def generate(movie: Movie, out: Path):
             movie.scenes,
         )
     )
-    generate_omakefile_mps(movie=movie, out=out)
+    # generate_omakefile_mps(movie=movie, out=out)
     # generate_master_tex(movie=movie, out=out)
     # generate_timeline(movie=movie, out=out)
     # list(
