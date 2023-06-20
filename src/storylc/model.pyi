@@ -43,8 +43,7 @@ class Animation:
 class Layer:
     __match_args__: Any
     name: str
-    animations: List[str]
-    x: int
+    animations: List[AnimationTimeLine]
     def __init__(self, name: str, animations: List[AnimationTimeLine]) -> None: ...
 
 class Scene:

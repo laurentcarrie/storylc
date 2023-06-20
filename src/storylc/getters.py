@@ -14,10 +14,10 @@ def get_animation(movie: Movie, name: str) -> Animation:
 
 
 def animations_of_layer(movie: Movie, layer: Layer) -> List[Animation]:
-    a_name: str  # noqa:F842
+    al: AnimationTimeLine  # noqa:F842
     return list(
         map(
-            lambda a_name: get_animation(movie=movie, name="xx"),
+            lambda al: get_animation(movie=movie, name=al.animation_name),
             layer.animations,
         )
     )
