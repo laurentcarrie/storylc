@@ -22,4 +22,3 @@ vardef main(expr i,duration,ips)=
 		t:=i/ips ;
 		fill b withcolor (k,1-k,0) ;
 enddef ;
-

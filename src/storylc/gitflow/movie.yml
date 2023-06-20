@@ -13,10 +13,10 @@ scenes:
         animations:
           - animation_name: anim2
 
-#
-#      - name: aaa
-#        animations:
-#          - animation_name: anim1
+
+      - name: aaa
+        animations:
+          - animation_name: anim1
 
 
 

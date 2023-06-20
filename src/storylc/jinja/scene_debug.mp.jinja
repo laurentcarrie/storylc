@@ -1,6 +1,6 @@
 prologues:=3;
-outputtemplate := "mps/frame_%c.mps";
-outputformat := "mps";
+outputtemplate := "pdf/frame_%c.pdf";
+outputformat := "pdf";
 
 
 
@@ -10,7 +10,7 @@ input mounted/{{ animation.path.replace(".mp","") }} ;
 
 
 
-for i:=0 upto {{ animation.duration * animation.ips -1 }}:
+for i:=0 upto {{ animation.duration * animation.ips }}:
 	beginfig(i);
 	    main(i,{{animation.duration}},{{animation.ips}}) ;
 	endfig ;

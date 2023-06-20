@@ -17,7 +17,7 @@
             label={{ scene.name }},
             controls, loop,
             timeline=timeline.txt
-        ]{ 20}{mps/frame_}{ {{ 0 }} }{ {{ scene.duration * 20 }} }
+        ]{ 20}{mps/frame_}{ {{ 0 }} }{ {{ nb_images -1 }} }
         \mediabutton[
         jsaction={
             if(anim[’{{scene.name}}’].isPlaying)

@@ -1,8 +1,8 @@
+from functools import reduce
 from pathlib import Path
 from typing import Iterator, List, Tuple, cast
 
 from jinja2 import Environment, PackageLoader, select_autoescape  # type:ignore
-from storylc.getters import animations_of_layer
 from storylc.model import Animation, Movie, Scene
 from storylc.project_logs import a_logger
 from storylc.timeline import image_id_of_triplets, timeline_of_scene
@@ -24,51 +24,10 @@ def make_starts(animations: List[Animation]) -> List[int]:
             return starts
         animation = animations[0]
         animations = animations[1:]
-        starts = starts + [starts[-1] + animation.end + 1]
+        starts = starts + [starts[-1] + animation.end]
         return rec_f(animations, starts)
 
     return rec_f(animations, [0])
-
-
-# def check_interpol(al: AnimationTimeLine):
-#     if len(al.timeline_x) != len(al.timeline_y):
-#         raise RuntimeError("len of vector should be even")
-#
-#     for i in range(1, len(al.timeline_x) - 1):
-#         if al.timeline_x[i] <= al.timeline_x[i - 1]:
-#             raise RuntimeError("interpol should be monotonic")
-
-
-# def interpol(al: AnimationTimeLine, t: float) -> float:
-#     for i in range(1, len(al.timeline_x) - 1):
-#         if al.timeline_x[i] > t:
-#             k = (t - al.timeline_x[i - 1]) / (al.timeline_x[i] - al.timeline_x[i - 1])
-#             assert k >= 0
-#             assert k <= 1
-#             return al.timeline_y[i - 1] + k * (al.timeline_y[i] - al.timeline_y[i - 1])
-#
-#     raise RuntimeError("bad t value")
-#     return 0.0
-
-
-# def make_layer_timelines(movie: Movie, layer: Layer) -> str:
-#     al: AnimationTimeLine
-#     duration = 10
-#     ips = 10
-#     anims: List[Animation] = list(
-#         map(
-#             lambda al: get_animation(movie=movie, name=al.animation_name),
-#             layer.animations,
-#         )
-#     )
-#
-#     def row(i: int) -> str:
-#         t: float = float(i * ips)
-#         anim: AnimationTimeLine
-#         v = list(map(lambda anim: str(int(interpol(al=anim, t=t))), anims))
-#         return ",".join(v)
-#
-#     return ""
 
 
 def fix_start(movie) -> Movie:
@@ -90,13 +49,6 @@ def fix_start(movie) -> Movie:
         )
     )
     return Movie(scenes=movie.scenes, animations=animations, root=movie.root)
-
-
-# def animation_of_name(movie: Movie, name: str) -> Animation:
-#     for a in movie.animations:
-#         if a.name == name:
-#             return a
-#     raise RuntimeError(f"no such animation : '{name}'")
 
 
 def generate_omakeroot(movie: Movie, out: Path) -> bool:
@@ -222,7 +174,20 @@ def generate_scene_tex(movie: Movie, scene: Scene, out: Path) -> bool:
     env: Environment = Environment()
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
-    new_data = template.render(libdir=str(here.absolute()), movie=movie, scene=scene)
+    animation: Animation  # noqa:F842
+    nb_images: int = reduce(
+        lambda a, b: a + b,
+        list(
+            map(
+                lambda layer: layer.animation.duration * layer.animation.ips,
+                scene.layers,
+            )
+        ),
+        0,
+    )
+    new_data = template.render(
+        libdir=str(here.absolute()), movie=movie, scene=scene, nb_images=nb_images
+    )
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True

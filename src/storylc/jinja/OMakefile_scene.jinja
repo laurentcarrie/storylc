@@ -1,17 +1,29 @@
-.PHONY: all pdf mps clean
+.PHONY: all pdf mps clean debug
 
 mkdir -p mps
+mkdir -p pdf
 
 mps_files= {% for i in range(nb_images) %} mps/frame_{{i}}.mps {% endfor %}
+
+debug_pdf_files= {% for i in range(nb_images) %} pdf/frame_{{i}}.pdf {% endfor %}
+
 
 {% for count_in_scene,anim_name,count_in_anim in zip %}
 mps/frame_{{count_in_scene}}.mps : ../tmp-animation-{{ anim_name }}/mps/frame_{{count_in_anim}}.mps
     ln-or-cp $< $@
 {% endfor %}
 
+{% for count_in_scene,anim_name,count_in_anim in zip %}
+pdf/frame_{{count_in_scene}}.pdf : ../tmp-animation-{{ anim_name }}/mps/frame_{{count_in_anim}}.pdf
+    ln-or-cp $< $@
+{% endfor %}
+
+
 mps : $(mps_files)
 
 pdf : scene.pdf
+
+debug : $(debug_pdf_files)
 
 scene.pdf : scene.tex $(mps_files)
     lualatex scene.tex

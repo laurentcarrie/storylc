@@ -1,7 +1,7 @@
 from typing import Iterator, List, Tuple
 
-from storylc.getters import animations_of_layer, get_animation
-from storylc.model import Animation, AnimationTimeLine, Layer, Movie, Scene
+from storylc.getters import get_animation
+from storylc.model import Animation, Layer, Movie, Scene
 
 def image_id_of_triplets(
     movie: Movie, scene: Scene
