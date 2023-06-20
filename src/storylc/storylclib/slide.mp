@@ -22,6 +22,13 @@ vardef drawshadowed(text t) =
 	endfor
 enddef ;
 
+def mygrida=
+	u:=.2cm ;
+	margin:=4cm ;
+	draw (-margin,-margin) -- (-margin,margin) -- (margin,margin) -- (-margin,margin) -- cycle withcolor 0.8white ;
+enddef ;
+
+
 def mygrid=
 	u:=.2cm ;
 	margin:=4cm ;

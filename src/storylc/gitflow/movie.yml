@@ -1,21 +1,35 @@
 scenes:
-  -
-    name: scene1
+  - name: scene1
+    duration: 20
     layers:
+
+
+      - name: grid
+        animations:
+          - animation_name: grid
+
       - name: aaa
         animations:
-            - animation_name: anim1
-              timeline: [0,0,10,10]
+          - animation_name: anim1
+
+
+      - name: bbb
+        animations:
+          - animation_name: anim2
+
+
 
 
 animations:
-  -
-    name: anim1
+  - name: anim1
     path: anim1.mp
-    duration: 10
-    ips: 20
-  -
-    name: anim2
-    path: anim1.mp
-    duration: 1
-    ips: 2
+    duration: 20
+    ips: 10
+  - name: anim2
+    path: anim2.mp
+    duration: 20
+    ips: 10
+  - name: grid
+    path: grid.mp
+    duration: 20
+    ips: 10
