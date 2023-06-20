@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import List, Tuple, cast, Iterator
+from typing import Iterator, List, Tuple, cast
 
 from jinja2 import Environment, PackageLoader, select_autoescape  # type:ignore
 from storylc.getters import animations_of_layer
 from storylc.model import Animation, Movie, Scene
 from storylc.project_logs import a_logger
-from storylc.timeline import timeline_of_scene
+from storylc.timeline import image_id_of_triplets, timeline_of_scene
 
 here = Path(__file__).absolute().parent
 
@@ -166,7 +166,7 @@ def generate_omakefile_scene(movie: Movie, scene: Scene, out: Path) -> bool:
     new_data = template.render(
         movie=movie,
         scene=scene,
-        zip=list(get_triplets())
+        zip=list(image_id_of_triplets(movie=movie, scene=scene))
         # zip=zip(range(len(scene.animations)), scene.animations),
     )
 

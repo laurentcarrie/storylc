@@ -1,0 +1,6 @@
+from typing import List, Optional
+
+from storylc.model import Animation, AnimationTimeLine, Layer, Movie
+
+def get_animation(movie: Movie, name: str) -> Animation: ...
+def animations_of_layer(movie: Movie, layer: Layer) -> List[Animation]: ...
