@@ -19,10 +19,6 @@ scenes:
           - animation_name: anim1
 
 
-
-
-
-
 animations:
   - name: anim1
     path: anim1.mp

@@ -1,14 +1,15 @@
 from typing import Iterator, List, Tuple
 
-from storylc.getters import get_animation
+from storylc.getters import animation_of_layer, get_animation
 from storylc.model import Animation, Layer, Movie, Scene
 
 
 def image_id_of_triplets(movie: Movie, scene: Scene) -> Iterator[Tuple[int, str, int]]:
     count = 0
     for layer in scene.layers:
-        for i in range(layer.animation.duration * layer.animation.ips):
-            yield (count, layer.animation.name, i)
+        animation: Animation = animation_of_layer(movie=movie, layer=layer)
+        for i in range(animation.duration * animation.ips):
+            yield (count, animation.name, i)
             count += 1
 
 
@@ -35,7 +36,7 @@ def timeline_of_scene(movie: Movie, scene: Scene) -> List[str]:
             list(
                 map(
                     lambda layer: layer_of_anim_and_row(
-                        row=i, anim_name=layer.animation.name
+                        row=i, anim_name=layer.animation_name
                     ),
                     scene.layers,
                 )

@@ -22,7 +22,7 @@ class Animation:
 @dataclass(eq=True, frozen=True)
 class Layer:
     name: str
-    animation: Animation
+    animation_name: str
 
 
 @dataclass(eq=True, frozen=True)
@@ -30,10 +30,6 @@ class Scene:
     name: str
     duration: int
     layers: List[Layer]
-
-    @property
-    def animations(self) -> Set[Animation]:
-        return set(map(lambda layer: layer.animation, self.layers))
 
 
 @dataclass(eq=True, frozen=True)

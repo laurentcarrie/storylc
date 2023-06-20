@@ -19,8 +19,8 @@ class Animation:
 class Layer:
     __match_args__: Any
     name: str
-    animation: Animation
-    def __init__(self, name: str, animation: Animation) -> None: ...
+    animation_name: str
+    def __init__(self, name: str, animation_name: str) -> None: ...
 
 class Scene:
     __match_args__: Any
@@ -28,8 +28,6 @@ class Scene:
     duration: int
     layers: List[Layer]
     def __init__(self, name: str, duration: int, layers: List[Layer]) -> None: ...
-    @property
-    def animations(self) -> Set[Animation]: ...
 
 class Movie:
     __match_args__: Any

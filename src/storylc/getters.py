@@ -11,3 +11,7 @@ def get_animation(movie: Movie, name: str) -> Animation:
     else:
         raise RuntimeError(f"no such animation {name}")
     return anim
+
+
+def animation_of_layer(movie: Movie, layer: Layer) -> Animation:
+    return get_animation(movie=movie, name=layer.animation_name)

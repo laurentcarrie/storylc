@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Iterator, List, Tuple, cast
 
 from jinja2 import Environment, PackageLoader, select_autoescape  # type:ignore
+from storylc.getters import animation_of_layer
 from storylc.model import Animation, Movie, Scene
 from storylc.project_logs import a_logger
 from storylc.timeline import image_id_of_triplets, timeline_of_scene
@@ -115,7 +116,19 @@ def generate_omakefile_scene(movie: Movie, scene: Scene, out: Path) -> bool:
 
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
-    nb_images = scene.duration * 20 * len(scene.animations)
+    nb_images = reduce(
+        lambda a, b: a + b,
+        list(
+            map(
+                lambda layer: (
+                    anim := animation_of_layer(movie=movie, layer=layer)
+                ).duration
+                * anim.ips,
+                scene.layers,
+            )
+        ),
+        0,
+    )
     new_data = template.render(
         movie=movie,
         scene=scene,
@@ -179,7 +192,10 @@ def generate_scene_tex(movie: Movie, scene: Scene, out: Path) -> bool:
         lambda a, b: a + b,
         list(
             map(
-                lambda layer: layer.animation.duration * layer.animation.ips,
+                lambda layer: (
+                    animation := animation_of_layer(movie=movie, layer=layer)
+                ).duration
+                * animation.ips,
                 scene.layers,
             )
         ),
