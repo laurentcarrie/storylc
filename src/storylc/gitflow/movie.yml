@@ -9,6 +9,16 @@ scenes:
       - name: aaa
         animation_name: anim1
 
+  - name: scene2
+    duration: 20
+    layers:
+      - name: bbb
+        animation_name: anim2b
+      - name: grid
+        animation_name: grid
+      - name: aaa
+        animation_name: anim1
+
 
 animations:
   - name: anim1
@@ -17,6 +27,10 @@ animations:
     ips: 20
   - name: anim2
     path: anim2.mp
+    duration: 20
+    ips: 20
+  - name: anim2b
+    path: anim2b.mp
     duration: 20
     ips: 20
   - name: grid

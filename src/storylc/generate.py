@@ -145,7 +145,7 @@ def generate_omakefile_scene(movie: Movie, scene: Scene, out: Path) -> bool:
     return False
 
 
-def generate_omakefile_animation(animation: Animation, out: Path) -> bool:
+def generate_omakefile_animation(srcdir: Path, animation: Animation, out: Path) -> bool:
     a_logger.info(f"generate omakefile for animation {animation.name}")
     j_file: Path = here / "jinja/OMakefile_animation.jinja"
     outfile = out / f"tmp-animation-{animation.name}/OMakefile"
@@ -153,7 +153,9 @@ def generate_omakefile_animation(animation: Animation, out: Path) -> bool:
     env: Environment = Environment()
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
-    new_data = template.render(libdir=str(here.absolute()), animation=animation)
+    new_data = template.render(
+        libdir=str(here.absolute()), animation=animation, srcdir=str(srcdir)
+    )
     if old_data == new_data:
         a_logger.info(f"{str(outfile.absolute())} was not regenerated")
         return True
@@ -315,8 +317,10 @@ def copy_src(movie: Movie, out: Path):
     )
 
 
-def generate_for_animation(movie: Movie, animation: Animation, out: Path) -> None:
-    generate_omakefile_animation(animation=animation, out=out)
+def generate_for_animation(
+    srcdir: Path, movie: Movie, animation: Animation, out: Path
+) -> None:
+    generate_omakefile_animation(srcdir=srcdir, animation=animation, out=out)
     generate_animation_tex(animation=animation, out=out)
     generate_animation(movie=movie, animation=animation, out=out)
     generate_timeline_animation(animation=animation, out=out)
@@ -330,14 +334,14 @@ def generate_for_scene(movie: Movie, scene: Scene, out: Path) -> None:
     generate_timeline_scene(movie=movie, scene=scene, out=out)
 
 
-def generate(movie: Movie, out: Path):
+def generate(srcdir: Path, movie: Movie, out: Path):
     out.mkdir(exist_ok=True)
     generate_omakeroot(movie=movie, out=out)
     generate_omakefile(movie=movie, out=out)
     list(
         map(
             lambda animation: generate_for_animation(
-                movie=movie, animation=animation, out=out
+                srcdir=srcdir, movie=movie, animation=animation, out=out
             ),
             movie.animations,
         )
@@ -366,4 +370,4 @@ def generate(movie: Movie, out: Path):
     #     )
     # )
     # copy_mp(out)
-    copy_src(movie=movie, out=out)
+    # copy_src(movie=movie, out=out)

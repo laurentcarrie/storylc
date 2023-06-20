@@ -27,7 +27,6 @@ debug : $(debug_pdf_files)
 
 scene.pdf : scene.tex $(mps_files)
     lualatex scene.tex
-    cat scene.log | grep -i rerun
 
 clean:
     rm -f $(mps_files) scene.pdf

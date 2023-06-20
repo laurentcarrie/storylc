@@ -4,15 +4,21 @@
 
 .SUBDIRS: {% for animation in movie.animations %} tmp-animation-{{animation.name}} {%endfor%} {% for scene in movie.scenes %} tmp-scene-{{scene.name}} {%endfor%}
 
-pdf_files= {% for animation in movie.animations %} animation-{{animation.name}}.pdf {% endfor %}
+pdf_files= \
+    {% for animation in movie.animations %} animation-{{animation.name}}.pdf {% endfor %} \
+    {% for scene in movie.scenes %} scene-{{scene.name}}.pdf {% endfor %}
 
 pdf : $(pdf_files)
 
 {% for animation in movie.animations %}
 animation-{{animation.name}}.pdf : tmp-animation-{{animation.name}}/animation.pdf
-    cp $< $@
+    ln-or-cp $< $@
 {% endfor %}
 
+{% for scene in movie.scenes %}
+scene-{{scene.name}}.pdf : tmp-scene-{{scene.name}}/scene.pdf
+    ln-or-cp $< $@
+{% endfor %}
 
 
 

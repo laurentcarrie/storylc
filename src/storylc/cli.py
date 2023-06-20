@@ -23,8 +23,9 @@ def main():
 
 @main.command("generate")
 @click.option("--yml", type=str, required=True, help="yaml input file")
+@click.option("--srcdir", type=str, required=True, help="root of source files")
 @click.option("--out", type=str, required=True, help="the directory where to generate")
-def _generate(out: str, yml: str):
+def _generate(out: str, srcdir: str, yml: str):
     try:
         Path("logs").mkdir(exist_ok=True)
         init_logs()
@@ -49,7 +50,7 @@ def _generate(out: str, yml: str):
             root=yml_path.parent, scenes=movie.scenes, animations=movie.animations
         )
         a_logger.info(movie)
-        generate(movie=movie, out=Path(out))
+        generate(srcdir=Path(srcdir), movie=movie, out=Path(out))
     except:  # noqa:E722
         traceback.print_exc()
         sys.exit(1)
