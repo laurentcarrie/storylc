@@ -26,7 +26,7 @@ def mygrida(expr t)=
 	u:=.2cm ;
 	margin:=4cm ;
 	draw (-margin,-margin) -- (-margin,margin) -- (margin,margin) -- (margin,-margin)  withcolor white	;
-	label(decimal t,(-margin,-margin)) ;
+	label(decimal t,(-margin,-margin)/2) ;
 enddef ;
 
 

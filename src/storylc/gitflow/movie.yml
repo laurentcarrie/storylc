@@ -2,21 +2,12 @@ scenes:
   - name: scene1
     duration: 20
     layers:
-
-
-#      - name: grid
-#        animations:
-#          - animation_name: grid
-#
-
       - name: bbb
-        animations:
-          - animation_name: anim2
-
-
+        animation_name: anim2
+      - name: grid
+        animation_name: grid
       - name: aaa
-        animations:
-          - animation_name: anim1
+        animation_name: anim1
 
 
 animations:
