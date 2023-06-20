@@ -4,18 +4,21 @@ scenes:
     layers:
 
 
-      - name: grid
-        animations:
-          - animation_name: grid
-
-      - name: aaa
-        animations:
-          - animation_name: anim1
-
+#      - name: grid
+#        animations:
+#          - animation_name: grid
+#
 
       - name: bbb
         animations:
           - animation_name: anim2
+
+#
+#      - name: aaa
+#        animations:
+#          - animation_name: anim1
+
+
 
 
 

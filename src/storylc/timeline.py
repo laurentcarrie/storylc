@@ -31,7 +31,7 @@ def timeline_of_scene(movie: Movie, scene: Scene) -> List[str]:
             filter(lambda x: x[2] == row and x[1] == anim_name, triplets)
         )
         assert len(now) == 1
-        return str(now[0][0])
+        return f"{now[0][0]}"
 
     ips = 20
 
@@ -48,4 +48,4 @@ def timeline_of_scene(movie: Movie, scene: Scene) -> List[str]:
             )
         )
 
-    return list(map(one_row, range(scene.duration * ips)))
+    return list(map(one_row, range(scene.duration * ips+1)))

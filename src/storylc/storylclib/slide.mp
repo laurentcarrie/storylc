@@ -22,10 +22,11 @@ vardef drawshadowed(text t) =
 	endfor
 enddef ;
 
-def mygrida=
+def mygrida(expr t)=
 	u:=.2cm ;
 	margin:=4cm ;
-	draw (-margin,-margin) -- (-margin,margin) -- (margin,margin) -- (-margin,margin) -- cycle withcolor 0.8white ;
+	draw (-margin,-margin) -- (-margin,margin) -- (margin,margin) -- (margin,-margin)  withcolor white	;
+	label(decimal t,(-margin,-margin)) ;
 enddef ;
 
 

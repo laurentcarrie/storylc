@@ -6,7 +6,7 @@ input storylclib/slide ;
 
 
 vardef main(expr i,duration,ips)=
-		mygrida ;
+		mygrida(i);
 		%transform t ;
 		%t = identity shifted (0cm,3cm) scaled 1 ;
 		%gitremote(t,"blah",0) ;
@@ -23,10 +23,3 @@ vardef main(expr i,duration,ips)=
 		fill b withcolor (k,1-k,0) ;
 enddef ;
 
-vardef main_b(expr i,duration,ips)=
-		k:=i / duration / ips ;
-		t:=i/ips ;
-        label("i=" & decimal i & "", (-5cm, 0));
-        label("k=" & decimal k & "", (-5cm, -.3cm));
-        label("t=" & decimal t & " s", (-5cm, -.6cm));
-enddef ;

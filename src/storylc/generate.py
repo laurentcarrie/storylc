@@ -163,9 +163,11 @@ def generate_omakefile_scene(movie: Movie, scene: Scene, out: Path) -> bool:
 
     template = env.from_string(source=j_file.read_text(), globals={})
     old_data = get_old(outfile)
+    nb_images = scene.duration * 20 * len(scene.animations)
     new_data = template.render(
         movie=movie,
         scene=scene,
+        nb_images=nb_images,
         zip=list(image_id_of_triplets(movie=movie, scene=scene))
         # zip=zip(range(len(scene.animations)), scene.animations),
     )
