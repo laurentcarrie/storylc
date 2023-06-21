@@ -11,22 +11,24 @@ verbatimtex
 \begin{document}
 etex
 
-% this function is from http://www.ursoswald.ch/metapost/tutorial/DynamicTeXLabels.html
-vardef produce_label(expr i, n) =
-  if     i=0:    s:="dotlabel.rt";
-  elseif i=n/4:  s:="dotlabel.top";
-  elseif i=n/2:  s:="dotlabel.lft";
-  elseif i=3n/4: s:="dotlabel.bot";
-  elseif i‹n/4:  s:="dotlabel.urt";
-  elseif i‹n/2:  s:="dotlabel.ulft";
-  elseif i‹3n/4: s:="dotlabel.llft";
-  else:          s:="dotlabel.lrt";
-  fi
-  s&"(btex $P_{"&decimal i&"}$ etex, z["&decimal i&"]);"
+vardef produce_label(expr i) =
+  "label(" & "btex $P_{" & "89" & "}$ etex, (3cm,3cm)) ;"
 enddef;
+
+
+
+
 
 
 def cartouche(expr i,duration,ips)=
 	u:=.2cm ;
 	margin:=4cm ;
+	% label(btex $P_{"&decimal i&"}$ etex,(3cm,3cm)) ;
+	% label(btex & decimal(i) & etex ,(3cm,3cm)) ;
+    %label(TEX("$"&decimal(round(5*i))&"$"),(3cm,3cm));enddef ;
+    %write produce_label(43) to "DynamicTeXLabels.tmp";
+    %write EOF to "DynamicTeXLabels.tmp";
+    %input DynamicTeXLabels.tmp;
+    label("i=" & decimal i , (3cm,3cm)) ;
 enddef ;
+

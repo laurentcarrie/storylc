@@ -4,12 +4,12 @@ scenes:
     layers:
       - name: cartouche
         animation_name: cartouche
-      - name: bbb
-        animation_name: anim2
-      - name: grid
-        animation_name: grid
-      - name: aaa
-        animation_name: anim1
+#      - name: bbb
+#        animation_name: anim2
+#      - name: grid
+#        animation_name: grid
+#      - name: aaa
+#        animation_name: anim1
 
   - name: scene2
     duration: 20
@@ -42,4 +42,4 @@ animations:
   - name: grid
     path: grid.mp
     duration: 20
-    ips: 20
+    ips: 1

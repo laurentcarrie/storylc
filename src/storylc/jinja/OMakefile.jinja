@@ -1,14 +1,14 @@
-#.SUBDIRS: mps {% for scene in movie.scenes %} tmp-{{scene.name}} {%endfor%}
-
-.PHONY: all install clean x pdf
+.PHONY: all install clean x debug
 
 .SUBDIRS: {% for animation in movie.animations %} tmp-animation-{{animation.name}} {%endfor%} {% for scene in movie.scenes %} tmp-scene-{{scene.name}} {%endfor%}
 
-pdf_files= \
+.PHONY: pdf
+
+debug_pdf= \
     {% for animation in movie.animations %} animation-{{animation.name}}.pdf {% endfor %} \
     {% for scene in movie.scenes %} scene-{{scene.name}}.pdf {% endfor %}
 
-pdf : $(pdf_files)
+debug : $(debug_pdf)
 
 {% for animation in movie.animations %}
 animation-{{animation.name}}.pdf : tmp-animation-{{animation.name}}/animation.pdf
