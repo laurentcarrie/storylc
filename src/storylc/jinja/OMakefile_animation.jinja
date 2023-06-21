@@ -7,6 +7,7 @@ mps_files = {% for i in range(animation.duration*animation.ips+1) %}mps/frame_{{
 rm -f storylclib
 ln -s {{libdir}}/storylclib storylclib
 
+rm -f mounted
 ln -s {{srcdir}} mounted
 
 $(mps_files) : animation.mp

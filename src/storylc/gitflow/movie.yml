@@ -2,6 +2,8 @@ scenes:
   - name: scene1
     duration: 20
     layers:
+      - name: cartouche
+        animation_name: cartouche
       - name: bbb
         animation_name: anim2
       - name: grid
@@ -21,6 +23,10 @@ scenes:
 
 
 animations:
+  - name: cartouche
+    path: cartouche.mp
+    duration: 20
+    ips: 20
   - name: anim1
     path: anim1.mp
     duration: 20

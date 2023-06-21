@@ -17,13 +17,13 @@ vardef main(expr i,duration,ips)=
 
 	transform tr ;
 
-	c := (0,k * 4cm *k) ;
+	c := (0,k * 2cm *k) ;
 
 	tr = identity scaled  (.1 * k + 1-k) shifted c;
 
 
 	%o := dir(-k*360) * 2cm ;
-	o := dir(-k*360) * 2cm transformed tr ;
+	o := dir(-k*360) * 2cm * (1-k)  transformed tr ;
 
 	%a := fullcircle scaled 2cm ;
 	a := fullcircle scaled 2cm transformed tr ;
